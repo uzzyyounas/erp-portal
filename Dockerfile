@@ -17,5 +17,6 @@ EXPOSE 10000
 
 CMD php artisan config:clear && \
     php artisan migrate --force || true && \
+    php artisan db:seed --force || true && \
     php -S 0.0.0.0:10000 -t public
 
