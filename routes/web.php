@@ -9,6 +9,8 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
+require __DIR__ . '/admin.php';
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
