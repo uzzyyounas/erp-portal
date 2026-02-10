@@ -15,5 +15,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- \
 
 EXPOSE 10000
 
-CMD php artisan migrate --force || true && \
+CMD php artisan config:clear && \
+    php artisan migrate --force || true && \
     php -S 0.0.0.0:10000 -t public
+
