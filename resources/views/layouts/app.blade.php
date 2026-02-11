@@ -278,9 +278,21 @@
         }
 
         .service-img{
+            width: 100%;
+            height: 220px;          /* fixed same height */
+            object-fit: cover;      /* crop properly */
+            border-radius: 8px;
+            /*width: 75px;*/
+            /*object-fit: contain;*/
+            /*height: 75px;*/
+        }
+
+        .service-img-home{
             width: 75px;
-            object-fit: contain;
             height: 75px;
+            object-fit: cover;
+            border-radius: 50%;
+            align-self: center;
         }
 
         /* Portfolio Grid */

@@ -17,11 +17,12 @@
             <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
                 <div class="service-card p-4">
                     @if($service->image)
-                    <img src="{{ $service->image }}" alt="{{ $service->title }}" class="img-fluid rounded mb-3">
-                    @endif
+                    <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->title }}" class="img-fluid service-img rounded mb-3">
+                    @else
                     <div class="service-icon text-center">
-                        <i class="{{ $service->icon ?? 'fas fa-fire' }}"></i>
+                        <i class="{{ $service->icon }}"></i>
                     </div>
+                    @endif
                     <h4 class="mt-3">{{ $service->title }}</h4>
                     <p class="text-muted">{{ $service->description }}</p>
                     <a href="{{ route('services.show', $service->slug) }}" class="btn btn-outline-primary">

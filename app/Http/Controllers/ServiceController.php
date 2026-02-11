@@ -13,6 +13,7 @@ class ServiceController extends Controller
     public function index()
     {
         $services = Service::active()->ordered()->get();
+//        dd($services);
         return view('services.index', compact('services'));
     }
 

@@ -50,6 +50,7 @@ class TestimonialController extends Controller
 
     public function update(Request $request, Testimonial $testimonial)
     {
+
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
             'client_position' => 'nullable|string|max:255',
@@ -58,9 +59,11 @@ class TestimonialController extends Controller
             'testimonial' => 'required|string',
             'rating' => 'required|integer|min:1|max:5',
             'order' => 'nullable|integer',
-            'is_featured' => 'boolean',
-            'is_active' => 'boolean',
         ]);
+
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_active'] = $request->boolean('is_active');
+
 
         if ($request->hasFile('client_photo')) {
             if ($testimonial->client_photo) {
@@ -80,7 +83,7 @@ class TestimonialController extends Controller
         if ($testimonial->client_photo) {
             \Storage::disk('public')->delete($testimonial->client_photo);
         }
-        
+
         $testimonial->delete();
 
         return redirect()->route('admin.testimonials.index')

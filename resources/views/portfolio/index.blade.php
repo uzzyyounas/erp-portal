@@ -33,7 +33,7 @@
             @forelse($portfolios as $index => $portfolio)
             <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
                 <div class="portfolio-item">
-                    <img src="{{ $portfolio->thumbnail ?? 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800' }}"
+                    <img src="{{ asset('storage/'.$portfolio->thumbnail) ?? 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800' }}"
                          alt="{{ $portfolio->title }}">
                     <div class="portfolio-overlay">
                         <h5 class="text-white mb-2">{{ $portfolio->title }}</h5>

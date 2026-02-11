@@ -38,7 +38,7 @@
                     <!-- Featured Image -->
                     @if($portfolio->thumbnail)
                         <div class="mb-4">
-                            <img src="{{ $portfolio->thumbnail }}"
+                            <img src="{{ asset('storage/' . $portfolio->thumbnail) }}"
                                  alt="{{ $portfolio->title }}"
                                  class="img-fluid rounded shadow-lg w-100"
                                  style="max-height: 600px; object-fit: cover;">
@@ -61,9 +61,9 @@
                                 <div class="row g-3">
                                     @foreach($portfolio->images as $image)
                                         <div class="col-md-4 col-sm-6">
-                                            <a href="{{ $image }}" data-lightbox="portfolio-gallery" data-title="{{ $portfolio->title }}">
+                                            <a href="{{ asset('storage/' . $image) }}" data-lightbox="portfolio-gallery" data-title="{{ $portfolio->title }}">
                                                 <div class="portfolio-item">
-                                                    <img src="{{ $image }}"
+                                                    <img src="{{ asset('storage/' . $image) }}"
                                                          alt="{{ $portfolio->title }}"
                                                          class="img-fluid rounded"
                                                          style="width: 100%; height: 250px; object-fit: cover;">
@@ -226,7 +226,7 @@
                     @foreach($relatedProjects as $index => $related)
                         <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
                             <div class="portfolio-item">
-                                <img src="{{ $related->thumbnail ?? 'https://via.placeholder.com/400x300' }}"
+                                <img src="{{ asset('storage/'.$related->thumbnail) ?? 'https://via.placeholder.com/400x300' }}"
                                      alt="{{ $related->title }}"
                                      style="width: 100%; height: 300px; object-fit: cover;">
                                 <div class="portfolio-overlay">

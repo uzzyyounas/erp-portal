@@ -16,7 +16,6 @@ class AuthController extends Controller
         if (Auth::check() && Auth::user()->is_admin) {
             return redirect()->route('admin.dashboard');
         }
-
         return view('admin.auth.login');
     }
 
@@ -35,7 +34,7 @@ class AuthController extends Controller
                 $request->session()->regenerate();
                 return redirect()->intended(route('admin.dashboard'));
             }
-
+            
             Auth::logout();
             return back()->withErrors([
                 'email' => 'You do not have admin access.',

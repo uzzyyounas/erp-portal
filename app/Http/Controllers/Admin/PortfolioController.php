@@ -68,6 +68,7 @@ class PortfolioController extends Controller
 
     public function update(Request $request, Portfolio $portfolio)
     {
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -122,7 +123,7 @@ class PortfolioController extends Controller
                 \Storage::disk('public')->delete($image);
             }
         }
-        
+
         $portfolio->delete();
 
         return redirect()->route('admin.portfolios.index')

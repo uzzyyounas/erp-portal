@@ -15,7 +15,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #e0e5ec 0%, #f7f9fc 100%);
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a1a0a 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -31,13 +31,13 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background:
+            background: 
                 repeating-linear-gradient(
                     90deg,
                     transparent,
                     transparent 2px,
-                    rgba(78, 84, 200, 0.03) 2px,
-                    rgba(78, 84, 200, 0.03) 4px
+                    rgba(255, 107, 24, 0.03) 2px,
+                    rgba(255, 107, 24, 0.03) 4px
                 );
             pointer-events: none;
         }
@@ -51,11 +51,11 @@
         }
 
         .login-card {
-            background: #ffffff;
+            background: white;
             border-radius: 20px;
-            box-shadow:
-                0 20px 60px rgba(0,0,0,0.15),
-                0 0 80px rgba(142, 149, 251, 0.2);
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.4),
+                0 0 100px rgba(255, 107, 24, 0.1);
             overflow: hidden;
             animation: slideUp 0.5s ease-out;
         }
@@ -72,7 +72,7 @@
         }
 
         .login-header {
-            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+            background: linear-gradient(135deg, #ff6b18 0%, #ff8c42 100%);
             color: white;
             padding: 3rem 2rem;
             text-align: center;
@@ -167,23 +167,23 @@
         }
 
         .form-control:focus {
-            border-color: #4e54c8;
-            box-shadow: 0 0 0 0.2rem rgba(78, 84, 200, 0.15);
+            border-color: #ff6b18;
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 24, 0.15);
             outline: none;
         }
 
         .form-check-input:checked {
-            background-color: #4e54c8;
-            border-color: #4e54c8;
+            background-color: #ff6b18;
+            border-color: #ff6b18;
         }
 
         .form-check-input:focus {
-            border-color: #4e54c8;
-            box-shadow: 0 0 0 0.2rem rgba(78, 84, 200, 0.15);
+            border-color: #ff6b18;
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 24, 0.15);
         }
 
         .btn-login {
-            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+            background: linear-gradient(135deg, #ff6b18 0%, #ff8c42 100%);
             border: none;
             color: white;
             padding: 0.875rem 2rem;
@@ -218,7 +218,7 @@
 
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(78, 84, 200, 0.3);
+            box-shadow: 0 8px 20px rgba(255, 107, 24, 0.3);
         }
 
         .btn-login:active {
@@ -254,7 +254,7 @@
         }
 
         .back-link a:hover {
-            color: #4e54c8;
+            color: #ff6b18;
         }
 
         .back-link a i {
@@ -298,98 +298,98 @@
     </style>
 </head>
 <body>
-<div class="login-container">
-    <div class="login-card">
-        <div class="login-header">
-            <div class="login-icon">
-                <i class="fas fa-hard-hat"></i>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fas fa-hard-hat"></i>
+                </div>
+                <h3>Admin Panel</h3>
+                <p>Welding Portfolio Management</p>
             </div>
-            <h3>Admin Panel</h3>
-            <p>Welding Portfolio Management</p>
-        </div>
 
-        <div class="login-body">
-            @if($errors->any())
+            <div class="login-body">
+                @if($errors->any())
                 <div class="alert alert-danger mb-4">
                     <i class="fas fa-exclamation-circle me-2"></i>
                     @foreach($errors->all() as $error)
-                        <div>{{ $error }}</div>
+                    <div>{{ $error }}</div>
                     @endforeach
                 </div>
-            @endif
+                @endif
 
-            <form method="POST" action="{{ route('admin.login') }}" id="loginForm">
-                @csrf
-
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email Address</label>
-                    <div class="input-group-icon">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email"
-                               class="form-control @error('email') is-invalid @enderror"
-                               id="email"
-                               name="email"
-                               value="{{ old('email') }}"
-                               placeholder="admin@example.com"
-                               required
-                               autofocus>
+                <form method="POST" action="{{ route('admin.login') }}" id="loginForm">
+                    @csrf
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <div class="input-group-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" 
+                                   class="form-control @error('email') is-invalid @enderror" 
+                                   id="email" 
+                                   name="email" 
+                                   value="{{ old('email') }}" 
+                                   placeholder="admin@example.com"
+                                   required 
+                                   autofocus>
+                        </div>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="input-group-icon">
-                        <i class="fas fa-lock"></i>
-                        <input type="password"
-                               class="form-control @error('password') is-invalid @enderror"
-                               id="password"
-                               name="password"
-                               placeholder="Enter your password"
-                               required>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" 
+                                   class="form-control @error('password') is-invalid @enderror" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="Enter your password"
+                                   required>
+                        </div>
                     </div>
-                </div>
 
-                <div class="mb-4">
-                    <div class="form-check">
-                        <input class="form-check-input"
-                               type="checkbox"
-                               id="remember"
-                               name="remember">
-                        <label class="form-check-label" for="remember">
-                            Keep me signed in
-                        </label>
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="remember" 
+                                   name="remember">
+                            <label class="form-check-label" for="remember">
+                                Keep me signed in
+                            </label>
+                        </div>
                     </div>
+
+                    <button type="submit" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="back-link">
+                    <a href="{{ route('home') }}">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Website
+                    </a>
                 </div>
-
-                <button type="submit" class="btn btn-login">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Sign In
-                </button>
-            </form>
-
-            <div class="back-link">
-                <a href="{{ route('home') }}">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Website
-                </a>
             </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <small style="color: rgba(255,255,255,0.5);">
+                Secured by Laravel Authentication
+            </small>
         </div>
     </div>
 
-    <div class="text-center mt-3">
-        <small style="color: rgba(0,0,0,0.5);">
-            Secured by Laravel Authentication
-        </small>
-    </div>
-</div>
-
-<script>
-    // Add loading state to button on submit
-    document.getElementById('loginForm').addEventListener('submit', function() {
-        const btn = this.querySelector('.btn-login');
-        btn.classList.add('loading');
-        btn.disabled = true;
-    });
-</script>
+    <script>
+        // Add loading state to button on submit
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            const btn = this.querySelector('.btn-login');
+            btn.classList.add('loading');
+            btn.disabled = true;
+        });
+    </script>
 </body>
 </html>
