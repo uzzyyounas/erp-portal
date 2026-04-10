@@ -1,51 +1,96 @@
 <?php
 
-use App\Http\Controllers\AboutController;
-use App\Http\Controllers\BlogController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PortfolioController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\Reports\AgedCustomerController;
 use Illuminate\Support\Facades\Route;
-
-require __DIR__ . '/admin.php';
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Reports\SalesReportController;
+use App\Http\Controllers\Forms\SalesFormController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\ModuleController;
+use App\Http\Controllers\Admin\MenuItemController;
+use App\Http\Controllers\Admin\CompanySettingsController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Auth Routes (guests only)
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+});
 
-//Route::get('/', function () {
-//    return view('welcome');
-//});
+Route::post('/logout', [LoginController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
 
-// About
-Route::get('/about', [AboutController::class, 'index'])->name('about');
+    Route::get('/', fn() => redirect()->route('dashboard'));
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Services
-Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('services.show');
 
-// Portfolio
-Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
-Route::get('/portfolio/{slug}', [PortfolioController::class, 'show'])->name('portfolio.show');
+    Route::prefix('reports')->name('reports.')->group(function () {
 
-// Testimonials
-Route::get('/testimonials', [TestimonialController::class, 'index'])->name('testimonials');
+        Route::prefix('reports')->name('aged-customer-analysis.')->group(function () {
+            Route::get('/aged-customer-analysis', [AgedCustomerController::class, 'index'])->name('index');
+            Route::get('/aged-customer-analysis/customers', [AgedCustomerController::class, 'customersBySalesman'])->name('customers');
+            Route::get('/aged-customer-analysis/generate', [AgedCustomerController::class, 'generate'])->name('generate');
+        });
 
-// Blog
-Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+    });
 
-// Contact
-Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+    Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
+
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // Company settings
+        Route::get('/company-settings', [CompanySettingsController::class, 'index'])->name('company-settings.index');
+        Route::put('/company-settings', [CompanySettingsController::class, 'update'])->name('company-settings.update');
+
+        // Users
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::put('/{user}', [UserController::class, 'update'])->name('update');
+            Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+        });
+
+        // Roles
+        Route::prefix('roles')->name('roles.')->group(function () {
+            Route::get('/', [RoleController::class, 'index'])->name('index');
+            Route::post('/', [RoleController::class, 'store'])->name('store');
+            Route::put('/{role}', [RoleController::class, 'update'])->name('update');
+            Route::patch('/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('permissions');
+        });
+
+        // Modules
+        Route::prefix('modules')->name('modules.')->group(function () {
+            Route::get('/', [ModuleController::class, 'index'])->name('index');
+            Route::post('/', [ModuleController::class, 'store'])->name('store');
+            Route::put('/{module}', [ModuleController::class, 'update'])->name('update');
+            Route::delete('/{module}', [ModuleController::class, 'destroy'])->name('destroy');
+        });
+
+        // Menu Items
+        Route::prefix('menu-items')->name('menu-items.')->group(function () {
+            Route::get('/', [MenuItemController::class, 'index'])->name('index');
+            Route::get('/create', [MenuItemController::class, 'create'])->name('create');
+            Route::post('/', [MenuItemController::class, 'store'])->name('store');
+            Route::get('/{menuItem}/edit', [MenuItemController::class, 'edit'])->name('edit');
+            Route::put('/{menuItem}', [MenuItemController::class, 'update'])->name('update');
+            Route::delete('/{menuItem}', [MenuItemController::class, 'destroy'])->name('destroy');
+            Route::post('/validate-route', [MenuItemController::class, 'validateRoute'])->name('validate-route');
+        });
+
+    });
+
+});
