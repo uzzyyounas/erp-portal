@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Reports;
 
 use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;          // composer require barryvdh/laravel-dompdf
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -13,9 +13,15 @@ class AgedCustomerController extends Controller
 {
     private string $prefix = '0_';
 
+    // ── FA transaction type constants (from FA includes/types.inc) ────────────
+    private const ST_CUSTCREDIT   = 11;  // Credit Note      → negative sign
+    private const ST_CUSTDELIVERY = 13;  // Delivery         → excluded
+    private const ST_CUSTPAYMENT  = 12;  // Customer Payment → negative sign
+    private const ST_SALESINVOICE = 10;  // Sales Invoice
+    private const ST_BANKDEPOSIT  = 2;   // Bank Deposit     → negative sign
+
     // ─────────────────────────────────────────────────────────────────────────
-    // GET  /reports/aged-customer-analysis
-    // Show the parameter form
+    // GET /reports/aged-customer-analysis  —  show parameter form
     // ─────────────────────────────────────────────────────────────────────────
     public function index()
     {
@@ -26,8 +32,7 @@ class AgedCustomerController extends Controller
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // GET  /reports/aged-customer-analysis/customers?salesman_code=X   (AJAX)
-    // Returns JSON list of customers filtered by salesman
+    // GET /reports/aged-customer-analysis/customers?salesman_code=X  (AJAX)
     // ─────────────────────────────────────────────────────────────────────────
     public function customersBySalesman(Request $request)
     {
@@ -51,24 +56,38 @@ class AgedCustomerController extends Controller
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // GET  /reports/aged-customer-analysis/generate
-    // Builds report data → renders Dompdf → streams PDF inline in browser
+    // GET /reports/aged-customer-analysis/generate  —  stream PDF
+    //
+    // Parameters (all GET):
+    //   to              string  date  Aging / end date  (ONLY date needed — no from)
+    //   salesman_code   string        Filter by salesman (optional)
+    //   debtor_no       string        Filter by single customer (optional)
+    //   show_allocated  "1"|null      Show Also Allocated (FA: $show_all)
+    //   summary_only    "1"|null      Summary Only        (FA: $summaryOnly)
+    //   suppress_zeros  "1"|null      Suppress Zeros      (FA: $no_zeros)
     // ─────────────────────────────────────────────────────────────────────────
     public function generate(Request $request)
     {
-        $request->validate([
-            'from' => 'required|date',
-            'to'   => 'required|date|after_or_equal:from',
-        ]);
+        $request->validate(['to' => 'required|date']);
 
-        $startTime    = microtime(true);   // ← start timer for generation_time_ms
+        $startTime = microtime(true);
 
-        $from         = $request->input('from');
+        // ── Parameters ────────────────────────────────────────────────────
         $to           = Carbon::parse($request->input('to'));
+        $toDateStr    = $to->format('Y-m-d');           // SQL-format date for raw queries
+
         $debtorNo     = $request->input('debtor_no')     ?: null;
         $salesmanCode = $request->input('salesman_code') ?: null;
 
-        // ── Which debtors to include ──────────────────────────────────────
+        // FA flags — exactly matching FA parameter names / meanings
+        $showAll      = $request->boolean('show_allocated'); // FA: $show_all / $all
+        $summaryOnly  = $request->boolean('summary_only');   // FA: $summaryOnly
+        $noZeros      = $request->boolean('suppress_zeros'); // FA: $no_zeros
+
+        // ── Aging period from FA company prefs ────────────────────────────
+        [$pastDueDays1, $pastDueDays2] = $this->getPastDueDays();
+
+        // ── Determine debtor list ─────────────────────────────────────────
         if ($debtorNo) {
             $debtors = DB::table($this->prefix . 'debtors_master')
                 ->where('debtor_no', $debtorNo)
@@ -92,7 +111,7 @@ class AgedCustomerController extends Controller
                 ->get(['debtor_no', 'name']);
         }
 
-        // ── Salesman label for report header ──────────────────────────────
+        // ── Salesman label ────────────────────────────────────────────────
         $salesmanLabel = 'All Salesmen';
         if ($salesmanCode) {
             $sm = DB::table($this->prefix . 'salesman')
@@ -101,47 +120,80 @@ class AgedCustomerController extends Controller
             $salesmanLabel = $sm ?? $salesmanCode;
         }
 
-        // ── Build customer transaction + aging buckets ────────────────────
+        // ── Build per-customer data ───────────────────────────────────────
         $customers = [];
 
         foreach ($debtors as $debtor) {
-            $transactions = $this->getTransactions(
-                $debtor->debtor_no, $from, $to->toDateString()
+
+            // ── Summary totals via get_customer_details() equivalent ───────
+            // FA uses this for the bold summary/totals row — a single
+            // aggregate (SUM) query, NOT summing individual row results.
+            $custrec = $this->getCustomerDetails(
+                $debtor->debtor_no, $toDateStr, $showAll, $pastDueDays1, $pastDueDays2
             );
 
-            if ($transactions->isEmpty()) {
+            if (!$custrec) {
                 continue;
             }
 
+            // ── Suppress Zeros (FA: $no_zeros) ────────────────────────────
+            // FA: if ($no_zeros && floatcmp(array_sum($str), 0) == 0) continue;
+            $strSum = $custrec->Balance; // Balance = grand total
+            if ($noZeros && abs((float)$strSum) < 0.001) {
+                continue;
+            }
+
+            // ── Aging buckets from aggregate (FA column ordering) ─────────
+            $balance = (float) $custrec->Balance;
+            $due     = (float) $custrec->Due;
+            $over1   = (float) $custrec->Overdue1;
+            $over2   = (float) $custrec->Overdue2;
+
             $totals = [
-                'current'    => 0,
-                'days_1_30'  => 0,
-                'days_31_60' => 0,
-                'over_60'    => 0,
-                'balance'    => 0,
+                'current'    => $balance - $due,        // FA: Balance - Due
+                'days_1_30'  => $due - $over1,          // FA: Due - Overdue1
+                'days_31_60' => $over1 - $over2,        // FA: Overdue1 - Overdue2
+                'over_60'    => $over2,                  // FA: Overdue2
+                'balance'    => $balance,                // FA: Balance
             ];
 
-            $txRows = $transactions->map(function ($tx) use ($to, &$totals) {
-                $balance = (float)$tx->TotalAmount - (float)($tx->Allocated ?? 0);
-                $days    = (int) Carbon::parse($tx->tran_date)->diffInDays($to);
+            // ── Detail transaction rows via get_invoices() equivalent ──────
+            // Only fetched when NOT summaryOnly
+            $txRows = [];
 
-                $current = $b1_30 = $b31_60 = $bOver60 = 0;
+            if (!$summaryOnly) {
+                $transactions = $this->getInvoices(
+                    $debtor->debtor_no, $toDateStr, $showAll, $pastDueDays1, $pastDueDays2
+                );
 
-                if      ($days <= 0)  { $current = $balance; }
-                elseif  ($days <= 30) { $b1_30   = $balance; }
-                elseif  ($days <= 60) { $b31_60  = $balance; }
-                else                  { $bOver60 = $balance; }
+                foreach ($transactions as $tx) {
+                    $txBal  = (float) $tx->Balance;
+                    $txDue  = (float) $tx->Due;
+                    $txOv1  = (float) $tx->Overdue1;
+                    $txOv2  = (float) $tx->Overdue2;
 
-                $totals['current']    += $current;
-                $totals['days_1_30']  += $b1_30;
-                $totals['days_31_60'] += $b31_60;
-                $totals['over_60']    += $bOver60;
-                $totals['balance']    += $balance;
-
-                return (array)$tx + compact(
-                        'days', 'current', 'b1_30', 'b31_60', 'bOver60', 'balance'
+                    // FA: $datediff = $now - strtotime($trans['tran_date'])
+                    //     days = round($datediff / (60 * 60 * 24))
+                    // Uses TODAY (time()), NOT the $to date
+                    $days = (int) round(
+                        (Carbon::now()->startOfDay()->timestamp -
+                            Carbon::parse($tx->tran_date)->startOfDay()->timestamp)
+                        / 86400
                     );
-            })->toArray();
+
+                    $txRows[] = [
+                        'type'      => $tx->type,
+                        'reference' => $tx->reference ?? '',
+                        'tran_date' => $tx->tran_date,
+                        'days'      => $days,
+                        'current'   => $txBal - $txDue,
+                        'b1_30'     => $txDue - $txOv1,
+                        'b31_60'    => $txOv1 - $txOv2,
+                        'bOver60'   => $txOv2,
+                        'balance'   => $txBal,
+                    ];
+                }
+            }
 
             $customers[] = [
                 'name'         => $debtor->name,
@@ -151,17 +203,13 @@ class AgedCustomerController extends Controller
             ];
         }
 
-        // ── Logo: must be an absolute file path for Dompdf ───────────────
-        // Dompdf cannot load URLs — pass the filesystem path or a base64 string.
+        // ── Logo (base64 — Dompdf cannot make HTTP requests) ─────────────
         $logoPath = public_path('images/lucky-logo.png');
-        $logoSrc  = null;
+        $logoSrc  = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
 
-        if (file_exists($logoPath)) {
-            // Embed as base64 so Dompdf never has to make an HTTP request
-            $logoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
-        }
-
-        // ── Compute grand totals ──────────────────────────────────────────
+        // ── Grand totals ──────────────────────────────────────────────────
         $grand = ['current' => 0, 'days_1_30' => 0, 'days_31_60' => 0, 'over_60' => 0, 'balance' => 0];
         foreach ($customers as $c) {
             $grand['current']    += $c['totals']['current'];
@@ -171,69 +219,220 @@ class AgedCustomerController extends Controller
             $grand['balance']    += $c['totals']['balance'];
         }
 
-        // ── Render blade → Dompdf ─────────────────────────────────────────
-        $from = Carbon::parse($from);   // convert to Carbon so blade can call ->format()
-
+        // ── Render PDF ────────────────────────────────────────────────────
         $pdf = Pdf::loadView('reports.sales.aged-customer-analysis', array_merge(
-            compact('customers', 'to', 'from', 'grand', 'salesmanLabel', 'logoSrc')
+            compact('customers', 'to', 'grand', 'salesmanLabel', 'logoSrc'),
+            [
+                'showAllocated' => $showAll,
+                'summaryOnly'   => $summaryOnly,
+                'suppressZeros' => $noZeros,
+                'pastDueDays1'  => $pastDueDays1,
+                'pastDueDays2'  => $pastDueDays2,
+            ]
         ))
             ->setPaper('a4', 'landscape')
             ->setOptions([
-                'defaultFont'         => 'DejaVu Sans',
-                'isHtml5ParserEnabled'=> true,
-                'isRemoteEnabled'     => false,
-                'dpi'                 => 150,
+                'defaultFont'          => 'DejaVu Sans',
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled'      => false,
+                'dpi'                  => 150,
             ]);
 
-        $filename = 'aged-customer-analysis-' . $to->format('Y-m-d') . '.pdf';
-
-        // ── Measure generation time & log the report run ──────────────────
+        $filename     = 'aged-customer-analysis-' . $to->format('Y-m-d') . '.pdf';
         $generationMs = (int) round((microtime(true) - $startTime) * 1000);
 
         $this->logReportRun($request, $generationMs, [
-            'from'          => $from->toDateString(),
-            'to'            => $to->toDateString(),
-            'salesman_code' => $salesmanCode,
-            'debtor_no'     => $debtorNo,
-            'salesman_name' => $salesmanLabel,
-            'customers'     => count($customers),
+            'to'             => $to->toDateString(),
+            'salesman_code'  => $salesmanCode,
+            'salesman_name'  => $salesmanLabel,
+            'debtor_no'      => $debtorNo,
+            'customers'      => count($customers),
+            'show_allocated' => $showAll,
+            'summary_only'   => $summaryOnly,
+            'suppress_zeros' => $noZeros,
         ]);
 
-        // stream() opens in browser tab; download() forces Save dialog — swap as needed
         return $pdf->stream($filename);
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // get_customer_details() equivalent
+    //
+    // Mirrors FA's get_customer_details($customer_id, $to, $show_all):
+    //   Returns a SINGLE row with SUM(Balance), SUM(Due), SUM(Overdue1), SUM(Overdue2)
+    //   Used for the bold summary row only.
+    //
+    // Raw SQL used (not query builder) to avoid binding order issues.
+    // ─────────────────────────────────────────────────────────────────────────
+    private function getCustomerDetails(
+        string $debtorNo,
+        string $toDate,
+        bool   $showAll,
+        int    $pastDueDays1,
+        int    $pastDueDays2
+    ) {
+        $p        = $this->prefix;
+        $negTypes = implode(',', [self::ST_CUSTCREDIT, self::ST_CUSTPAYMENT, self::ST_BANKDEPOSIT]);
+        $allocSub = $showAll ? '' : '- trans.alloc';
+
+        $sql = "
+            SELECT
+                SUM(
+                    IF(`type` IN({$negTypes}), -1, 1)
+                    * (
+                        IF(trans.prep_amount, trans.prep_amount,
+                           ABS(trans.ov_amount + trans.ov_gst + trans.ov_freight
+                               + trans.ov_freight_tax + trans.ov_discount)
+                        ) {$allocSub}
+                      )
+                ) AS Balance,
+
+                SUM(IF(
+                    (TO_DAYS('{$toDate}') - TO_DAYS(IF(type = " . self::ST_SALESINVOICE . ", due_date, tran_date))) >= 0,
+                    IF(`type` IN({$negTypes}), -1, 1)
+                    * (IF(trans.prep_amount, trans.prep_amount,
+                          ABS(trans.ov_amount + trans.ov_gst + trans.ov_freight
+                              + trans.ov_freight_tax + trans.ov_discount)
+                       ) {$allocSub}),
+                    0
+                )) AS Due,
+
+                SUM(IF(
+                    (TO_DAYS('{$toDate}') - TO_DAYS(IF(type = " . self::ST_SALESINVOICE . ", due_date, tran_date))) >= {$pastDueDays1},
+                    IF(`type` IN({$negTypes}), -1, 1)
+                    * (IF(trans.prep_amount, trans.prep_amount,
+                          ABS(trans.ov_amount + trans.ov_gst + trans.ov_freight
+                              + trans.ov_freight_tax + trans.ov_discount)
+                       ) {$allocSub}),
+                    0
+                )) AS Overdue1,
+
+                SUM(IF(
+                    (TO_DAYS('{$toDate}') - TO_DAYS(IF(type = " . self::ST_SALESINVOICE . ", due_date, tran_date))) >= {$pastDueDays2},
+                    IF(`type` IN({$negTypes}), -1, 1)
+                    * (IF(trans.prep_amount, trans.prep_amount,
+                          ABS(trans.ov_amount + trans.ov_gst + trans.ov_freight
+                              + trans.ov_freight_tax + trans.ov_discount)
+                       ) {$allocSub}),
+                    0
+                )) AS Overdue2
+
+            FROM {$p}debtor_trans trans
+            WHERE debtor_no = ?
+              AND type <> " . self::ST_CUSTDELIVERY . "
+              AND tran_date <= '{$toDate}'
+        ";
+
+        $rows = DB::select($sql, [$debtorNo]);
+        return $rows[0] ?? null;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // get_invoices() equivalent
+    //
+    // Mirrors FA's get_invoices($customer_id, $to, $all) EXACTLY.
+    // Returns individual transaction rows with Balance/Due/Overdue1/Overdue2.
+    //
+    // Raw SQL avoids Laravel query builder binding order issues.
+    // ─────────────────────────────────────────────────────────────────────────
+    private function getInvoices(
+        string $debtorNo,
+        string $toDate,
+        bool   $showAll,
+        int    $pastDueDays1,
+        int    $pastDueDays2
+    ): array {
+        $p        = $this->prefix;
+        $negTypes = implode(',', [self::ST_CUSTCREDIT, self::ST_CUSTPAYMENT, self::ST_BANKDEPOSIT]);
+
+        // FA: ($all ? '' : '- trans.alloc')
+        $allocSub = $showAll ? '' : '- trans.alloc';
+
+        // FA value expression: sign * (prep_amount OR ABS(ov_...) [- alloc])
+        $value = "
+            IF(`type` IN({$negTypes}), -1, 1)
+            * (
+                IF(trans.prep_amount, trans.prep_amount,
+                   ABS(trans.ov_amount + trans.ov_gst + trans.ov_freight
+                       + trans.ov_freight_tax + trans.ov_discount)
+                ) {$allocSub}
+              )
+        ";
+
+        // FA due expression: invoices use due_date, others use tran_date
+        $due = "IF(type = " . self::ST_SALESINVOICE . ", due_date, tran_date)";
+
+        // Exact FA SQL from get_invoices()
+        $sql = "
+            SELECT
+                type,
+                reference,
+                tran_date,
+                ({$value})                                                                          AS Balance,
+                IF((TO_DAYS('{$toDate}') - TO_DAYS({$due})) >= 0,            ({$value}), 0)  AS Due,
+                IF((TO_DAYS('{$toDate}') - TO_DAYS({$due})) >= {$pastDueDays1}, ({$value}), 0)  AS Overdue1,
+                IF((TO_DAYS('{$toDate}') - TO_DAYS({$due})) >= {$pastDueDays2}, ({$value}), 0)  AS Overdue2
+            FROM {$p}debtor_trans trans
+            WHERE type <> " . self::ST_CUSTDELIVERY . "
+              AND debtor_no = ?
+              AND tran_date <= '{$toDate}'
+              AND ABS({$value}) > 0.001
+            ORDER BY tran_date
+        ";
+
+        return DB::select($sql, [$debtorNo]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Read past_due_days from FA sys_prefs (default 30 → period 1-30 / 31-60 / 60+)
+    // ─────────────────────────────────────────────────────────────────────────
+    private function getPastDueDays(): array
+    {
+        // Try both possible column name styles used in different FA versions
+        $days1 = (int) (
+            DB::table($this->prefix . 'sys_prefs')
+                ->where('name', 'past_due_days')   // newer FA
+                ->value('value')
+            ?? DB::table($this->prefix . 'sys_prefs')
+            ->where('name', 'past_due_days')         // older FA
+            ->value('value')
+            ?? 30
+        );
+
+        return [$days1, $days1 * 2];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Log report run to report_logs
+    // ─────────────────────────────────────────────────────────────────────────
     private function logReportRun(Request $request, int $generationMs, array $parameters): void
     {
         try {
-            // Look up the report record by its slug (must exist in reports table)
-            $reportId = DB::table('menu_items')
-                ->where('slug', 'aged-customer-anaylsis')
+            $menuItemId = DB::table('menu_items')
+                ->where('slug', 'aged-customer-analysis')
                 ->value('id');
 
-            if (!$reportId) {
+            if (!$menuItemId) {
                 return;
             }
 
             DB::table('report_logs')->insert([
                 'user_id'            => auth()->id(),
-                'report_id'          => $reportId,
+                'report_id'          => $menuItemId,
                 'parameters'         => json_encode($parameters),
                 'ip_address'         => $request->ip(),
                 'generation_time_ms' => $generationMs,
                 'created_at'         => now(),
                 'updated_at'         => now(),
             ]);
+
         } catch (\Throwable $e) {
-            // Never let logging break the actual PDF response
-            \Illuminate\Support\Facades\Log::warning(
-                'aged-customer-analysis: report_log insert failed — ' . $e->getMessage()
-            );
+            Log::warning('aged-customer-analysis: report_log insert failed — ' . $e->getMessage());
         }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // PRIVATE HELPERS
+    // Helpers
     // ─────────────────────────────────────────────────────────────────────────
 
     private function getSalesmanList()
@@ -256,66 +455,5 @@ class AgedCustomerController extends Controller
             ->where('inactive', 0)
             ->orderBy('name')
             ->get(['debtor_no', 'name', 'curr_code', 'inactive']);
-    }
-
-    // ── Core FA transaction query — fixed for MySQL ONLY_FULL_GROUP_BY ────────
-    private function getTransactions(string $debtorNo, string $from, string $to)
-    {
-        $p = $this->prefix;
-
-        $ST_SALESINVOICE  = 13;
-        $ST_CUSTDELIVERY  = 11;
-        $PERSON_TYPE_CUST = 2;
-
-        $allocFrom = DB::table("{$p}cust_allocations as alloc")
-            ->select('trans_type_from as trans_type', 'trans_no_from as trans_no')
-            ->selectRaw('SUM(amt) as amount')
-            ->where('person_id', $debtorNo)
-            ->whereRaw('date_alloc <= ?', [$to])
-            ->groupBy('trans_type_from', 'trans_no_from');
-
-        $allocTo = DB::table("{$p}cust_allocations as alloc")
-            ->select('trans_type_to as trans_type', 'trans_no_to as trans_no')
-            ->selectRaw('SUM(amt) as amount')
-            ->where('person_id', $debtorNo)
-            ->whereRaw('date_alloc <= ?', [$to])
-            ->groupBy('trans_type_to', 'trans_no_to');
-
-        return DB::table("{$p}debtor_trans as trans")
-            ->leftJoinSub($allocFrom, 'alloc_from', function ($join) {
-                $join->on('alloc_from.trans_type', '=', 'trans.type')
-                    ->on('alloc_from.trans_no',   '=', 'trans.trans_no');
-            })
-            ->leftJoinSub($allocTo, 'alloc_to', function ($join) {
-                $join->on('alloc_to.trans_type', '=', 'trans.type')
-                    ->on('alloc_to.trans_no',   '=', 'trans.trans_no');
-            })
-            ->leftJoin("{$p}gl_trans as gl_trans", function ($join) {
-                $join->on('trans.type',         '=', 'gl_trans.type')
-                    ->on('trans.trans_no',      '=', 'gl_trans.type_no')
-                    ->on('gl_trans.person_id',  '=', 'trans.debtor_no');
-            })
-            ->leftJoin("{$p}voided as voided", function ($join) {
-                $join->on('trans.type',     '=', 'voided.type')
-                    ->on('trans.trans_no', '=', 'voided.id');
-            })
-            ->select('trans.*', 'gl_trans.memo_')
-            ->selectRaw("
-                IF(gl_trans.amount, gl_trans.amount,
-                    trans.ov_amount + trans.ov_gst + trans.ov_freight
-                    + trans.ov_freight_tax + trans.ov_discount
-                ) AS TotalAmount
-            ")
-            ->selectRaw('IFNULL(alloc_from.amount, alloc_to.amount) AS Allocated')
-            ->selectRaw("((trans.type = {$ST_SALESINVOICE}) AND trans.due_date < ?) AS OverDue", [$to])
-            ->whereRaw('trans.tran_date >= ?', [$from])
-            ->whereRaw('trans.tran_date <= ?', [$to])
-            ->where('trans.debtor_no',         $debtorNo)
-            ->where('trans.type',              '<>', $ST_CUSTDELIVERY)
-            ->whereNull('voided.id')
-            ->where('gl_trans.amount',         '<>', 0)
-            ->where('gl_trans.person_type_id', $PERSON_TYPE_CUST)
-            ->orderBy('trans.tran_date')
-            ->get();
     }
 }
