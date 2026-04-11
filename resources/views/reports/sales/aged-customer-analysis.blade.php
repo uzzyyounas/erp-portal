@@ -49,7 +49,7 @@
             color: #000000;
             line-height: 1.7;
         }
-        .logo-img { max-height:152pt; max-width:150pt; }
+        .logo-img { max-height:152pt; max-width:152pt; }
 
         /* ─── Salesman banner ────────────────────────────────────────── */
         .salesman-banner {
@@ -79,7 +79,7 @@
         .aging-label {
             text-align: center;
             font-size: 9pt;
-            font-weight: normal;
+            font-weight: bold;
             color: #000000;
             margin-bottom: 5pt;
         }
@@ -231,15 +231,15 @@
 @php
     use Carbon\Carbon;
 
-    $typeLabels = [
+     $typeLabels = [
         0  => 'Journal Entry',
         1  => 'Bank Payment',
         2  => 'Bank Deposit',
         3  => 'Bank Charge',
-        10 => 'Credit Note',
-        11 => 'Delivery',
+        11 => 'Credit Note',
+        13 => 'Delivery',
         12 => 'Customer Payment',
-        13 => 'Sales Invoice',
+        10 => 'Sales Invoice',
         16 => 'Debit Note',
         17 => 'Purchase Invoice',
         30 => 'Sales Order',

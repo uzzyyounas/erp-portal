@@ -114,10 +114,26 @@ class AgedCustomerController extends Controller
         // ── Salesman label ────────────────────────────────────────────────
         $salesmanLabel = 'All Salesmen';
         if ($salesmanCode) {
+            // Salesman explicitly selected — look up their name
             $sm = DB::table($this->prefix . 'salesman')
                 ->where('salesman_code', $salesmanCode)
                 ->value('salesman_name');
             $salesmanLabel = $sm ?? $salesmanCode;
+
+        } elseif ($debtorNo) {
+            // No salesman selected but a specific customer is selected →
+            // auto-resolve the salesman assigned to that customer's branch.
+            $p  = $this->prefix;
+            $sm = DB::select("
+                SELECT s.salesman_name
+                FROM {$p}cust_branch b
+                INNER JOIN {$p}salesman s ON b.salesman = s.salesman_code
+                WHERE b.debtor_no = ?
+                LIMIT 1
+            ", [$debtorNo]);
+            if (!empty($sm)) {
+                $salesmanLabel = $sm[0]->salesman_name;
+            }
         }
 
         // ── Build per-customer data ───────────────────────────────────────
