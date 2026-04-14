@@ -310,7 +310,6 @@
                     ['route'=>'admin.menu-items.index',    'icon'=>'bi-list-ul',         'label'=>'Menu Items'],
                     ['route'=>'admin.roles.index',         'icon'=>'bi-shield-fill',     'label'=>'Roles & Permissions'],
                     ['route'=>'admin.users.index',         'icon'=>'bi-people-fill',     'label'=>'Users'],
-                    ['route'=>'admin.company-settings.index','icon'=>'bi-building',      'label'=>'Company Settings'],
                 ] as $al)
                     <div class="nav-item">
                         <a href="{{ route($al['route']) }}"

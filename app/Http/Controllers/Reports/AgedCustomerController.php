@@ -68,13 +68,18 @@ class AgedCustomerController extends Controller
     // ─────────────────────────────────────────────────────────────────────────
     public function generate(Request $request)
     {
-        $request->validate(['to' => 'required|date']);
+        $request->validate([
+            'from' => 'required|date',
+            'to'   => 'required|date|after_or_equal:from',
+        ]);
 
         $startTime = microtime(true);
 
         // ── Parameters ────────────────────────────────────────────────────
+        $from         = Carbon::parse($request->input('from'));
+        $fromDateStr  = $from->format('Y-m-d');         // SQL-format start date
         $to           = Carbon::parse($request->input('to'));
-        $toDateStr    = $to->format('Y-m-d');           // SQL-format date for raw queries
+        $toDateStr    = $to->format('Y-m-d');           // SQL-format end / aging date
 
         $debtorNo     = $request->input('debtor_no')     ?: null;
         $salesmanCode = $request->input('salesman_code') ?: null;
@@ -145,7 +150,7 @@ class AgedCustomerController extends Controller
             // FA uses this for the bold summary/totals row — a single
             // aggregate (SUM) query, NOT summing individual row results.
             $custrec = $this->getCustomerDetails(
-                $debtor->debtor_no, $toDateStr, $showAll, $pastDueDays1, $pastDueDays2
+                $debtor->debtor_no, $fromDateStr, $toDateStr, $showAll, $pastDueDays1, $pastDueDays2
             );
 
             if (!$custrec) {
@@ -179,7 +184,7 @@ class AgedCustomerController extends Controller
 
             if (!$summaryOnly) {
                 $transactions = $this->getInvoices(
-                    $debtor->debtor_no, $toDateStr, $showAll, $pastDueDays1, $pastDueDays2
+                    $debtor->debtor_no, $fromDateStr, $toDateStr, $showAll, $pastDueDays1, $pastDueDays2
                 );
 
                 foreach ($transactions as $tx) {
@@ -237,7 +242,7 @@ class AgedCustomerController extends Controller
 
         // ── Render PDF ────────────────────────────────────────────────────
         $pdf = Pdf::loadView('reports.sales.aged-customer-analysis', array_merge(
-            compact('customers', 'to', 'grand', 'salesmanLabel', 'logoSrc'),
+            compact('customers', 'from', 'to', 'grand', 'salesmanLabel', 'logoSrc'),
             [
                 'showAllocated' => $showAll,
                 'summaryOnly'   => $summaryOnly,
@@ -258,6 +263,7 @@ class AgedCustomerController extends Controller
         $generationMs = (int) round((microtime(true) - $startTime) * 1000);
 
         $this->logReportRun($request, $generationMs, [
+            'from'           => $from->toDateString(),
             'to'             => $to->toDateString(),
             'salesman_code'  => $salesmanCode,
             'salesman_name'  => $salesmanLabel,
@@ -282,6 +288,7 @@ class AgedCustomerController extends Controller
     // ─────────────────────────────────────────────────────────────────────────
     private function getCustomerDetails(
         string $debtorNo,
+        string $fromDate,
         string $toDate,
         bool   $showAll,
         int    $pastDueDays1,
@@ -336,6 +343,7 @@ class AgedCustomerController extends Controller
             FROM {$p}debtor_trans trans
             WHERE debtor_no = ?
               AND type <> " . self::ST_CUSTDELIVERY . "
+              AND tran_date >= '{$fromDate}'
               AND tran_date <= '{$toDate}'
         ";
 
@@ -353,6 +361,7 @@ class AgedCustomerController extends Controller
     // ─────────────────────────────────────────────────────────────────────────
     private function getInvoices(
         string $debtorNo,
+        string $fromDate,
         string $toDate,
         bool   $showAll,
         int    $pastDueDays1,
@@ -391,6 +400,7 @@ class AgedCustomerController extends Controller
             FROM {$p}debtor_trans trans
             WHERE type <> " . self::ST_CUSTDELIVERY . "
               AND debtor_no = ?
+              AND tran_date >= '{$fromDate}'
               AND tran_date <= '{$toDate}'
               AND ABS({$value}) > 0.001
             ORDER BY tran_date

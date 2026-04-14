@@ -154,7 +154,7 @@
             <div class="hicon"><i class="bi bi-sliders2"></i></div>
             <div>
                 <h5>Report Parameters</h5>
-                <p>Set the aging date, filters and display options, then click Generate.</p>
+                <p>Set the date range, filters and display options, then click Generate.</p>
             </div>
         </div>
 
@@ -163,25 +163,28 @@
 
             <div class="param-body">
 
-                {{-- ── End Date (Aging Date) ── --}}
-                {{-- FA only has one date: the END / AGING date.
-                     All outstanding transactions up to this date are shown.
-                     There is NO from date in FA's aged analysis. --}}
-                <div class="group-label"><i class="bi bi-calendar3 me-1"></i>Aging Date</div>
+                {{-- ── Date Range: Start Date + End Date ── --}}
+                <div class="group-label"><i class="bi bi-calendar3 me-1"></i>Date Range</div>
                 <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <label class="field-label"><i class="bi bi-calendar-event"></i> Start Date</label>
+                        <input type="date" name="from" id="from" class="form-control"
+                               value="{{ now()->startOfMonth()->toDateString() }}" required>
+                        <div class="date-presets">
+                            <span class="date-preset" data-target="from" data-val="month_start">This Month</span>
+                            <span class="date-preset" data-target="from" data-val="qtr_start">This Quarter</span>
+                            <span class="date-preset" data-target="from" data-val="year_start">This Year</span>
+                        </div>
+                    </div>
                     <div class="col-sm-6">
                         <label class="field-label"><i class="bi bi-calendar-check"></i> End Date (Aging Date)</label>
                         <input type="date" name="to" id="to" class="form-control"
                                value="{{ now()->toDateString() }}" required>
                         <div class="date-presets">
-                            <span class="date-preset" data-val="today">Today</span>
-                            <span class="date-preset" data-val="month_end">Month End</span>
-                            <span class="date-preset" data-val="qtr_end">Quarter End</span>
-                            <span class="date-preset" data-val="year_end">Year End</span>
-                        </div>
-                        <div style="font-size:.68rem;color:#94a3b8;margin-top:5px;">
-                            <i class="bi bi-info-circle me-1"></i>
-                            All transactions up to this date are included regardless of transaction date.
+                            <span class="date-preset" data-target="to" data-val="today">Today</span>
+                            <span class="date-preset" data-target="to" data-val="month_end">Month End</span>
+                            <span class="date-preset" data-target="to" data-val="qtr_end">Quarter End</span>
+                            <span class="date-preset" data-target="to" data-val="year_end">Year End</span>
                         </div>
                     </div>
                 </div>
@@ -289,16 +292,20 @@
             const q   = m => Math.floor(m / 3);
 
             const presets = {
-                today:    () => ymd(now),
-                month_end:() => ymd(new Date(now.getFullYear(), now.getMonth()+1, 0)),
-                qtr_end:  () => ymd(new Date(now.getFullYear(), q(now.getMonth())*3+3, 0)),
-                year_end: () => ymd(new Date(now.getFullYear(), 11, 31)),
+                today:       () => ymd(now),
+                month_start: () => ymd(new Date(now.getFullYear(), now.getMonth(), 1)),
+                month_end:   () => ymd(new Date(now.getFullYear(), now.getMonth()+1, 0)),
+                qtr_start:   () => ymd(new Date(now.getFullYear(), q(now.getMonth())*3, 1)),
+                qtr_end:     () => ymd(new Date(now.getFullYear(), q(now.getMonth())*3+3, 0)),
+                year_start:  () => ymd(new Date(now.getFullYear(), 0, 1)),
+                year_end:    () => ymd(new Date(now.getFullYear(), 11, 31)),
             };
 
             document.querySelectorAll('.date-preset').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const fn = presets[btn.dataset.val];
-                    if (fn) document.getElementById('to').value = fn();
+                    const fn     = presets[btn.dataset.val];
+                    const target = btn.dataset.target || 'to';   // default to 'to' if no target attr
+                    if (fn) document.getElementById(target).value = fn();
                 });
             });
 
@@ -351,7 +358,8 @@
 
             /* ── Reset ───────────────────────────────────────────── */
             document.getElementById('resetBtn').addEventListener('click', () => {
-                document.getElementById('to').value = '{{ now()->toDateString() }}';
+                document.getElementById('from').value = '{{ now()->startOfMonth()->toDateString() }}';
+                document.getElementById('to').value   = '{{ now()->toDateString() }}';
                 salesmanSel.value = '';
                 rebuildCustomers(allOptions);
 
