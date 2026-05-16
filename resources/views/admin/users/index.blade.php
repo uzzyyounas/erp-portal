@@ -129,7 +129,8 @@
 document.getElementById('editUserModal').addEventListener('show.bs.modal', function (e) {
     const user = JSON.parse(e.relatedTarget.dataset.user);
     const form = document.getElementById('editUserForm');
-    form.action = `/admin/users/${user.id}`;
+    // form.action = `/admin/users/${user.id}`;
+    form.action = `{{ url('admin/users') }}/${user.id}`;
     form.querySelector('[name=name]').value     = user.name;
     form.querySelector('[name=email]').value    = user.email;
     form.querySelector('[name=username]').value = user.username || '';
