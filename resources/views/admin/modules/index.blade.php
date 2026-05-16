@@ -135,7 +135,8 @@
 document.getElementById('editModal').addEventListener('show.bs.modal', function(e) {
     const mod  = JSON.parse(e.relatedTarget.dataset.module);
     const form = document.getElementById('editForm');
-    form.action = `/admin/modules/${mod.id}`;
+    // form.action = `/admin/modules/${mod.id}`;
+    form.action = `{{ url('admin/modules') }}/${mod.id}`;
     form.querySelector('[name=name]').value        = mod.name;
     form.querySelector('[name=icon]').value        = mod.icon;
     form.querySelector('[name=color]').value       = mod.color || '#1a3a5c';
