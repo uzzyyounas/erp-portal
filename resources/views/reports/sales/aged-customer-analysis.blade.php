@@ -160,8 +160,21 @@
     $lB4 = $agingLabels['b4'] ?? 'Over 90 Days';
 @endphp
 
-@forelse($customers as $i => $customer)
-    <div class="page-block">
+@if(empty($customers))
+    <div class="empty-state">
+        No transactions found for the selected parameters.
+        @if($suppressZeros ?? false)
+            <br><span style="font-size:8pt;">(Suppress Zeros is on — try unchecking it)</span>
+        @endif
+    </div>
+
+@elseif($summaryOnly ?? false)
+
+    {{-- ══════════════════════════════════════════════════════════════════════
+         SUMMARY-ONLY MODE — all customers in one consolidated table, no page
+         breaks between rows.
+    ══════════════════════════════════════════════════════════════════════ --}}
+    <div class="page-block" style="page-break-after: avoid;">
 
         {{-- Company Header --}}
         <table class="co-table">
@@ -186,115 +199,200 @@
             </tr>
         </table>
 
-        {{-- ── Salesman Banner ── --}}
+        {{-- Salesman Banner --}}
         @if(!empty($salesmanLabel) && $salesmanLabel !== 'All Salesmen')
             <div class="salesman-banner">{{ strtoupper($salesmanLabel) }}</div>
         @endif
 
-        {{-- ── Customer Banner ── --}}
-        <div class="customer-banner">{{ strtoupper($customer['name']) }}</div>
+        {{-- Report title banner --}}
+{{--        <div class="customer-banner">AGED CUSTOMER ANALYSIS — SUMMARY</div>--}}
 
         {{-- Period & Aging Date --}}
         <div class="aging-label">
             Period: {{ $from->format('d M Y') }} &ndash; {{ $to->format('d M Y') }}
             &nbsp;&nbsp;|&nbsp;&nbsp;
             Aging Date {{ $to->format('d-M-y') }}
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            {{ count($customers) }} Customers
         </div>
 
-{{--        @if($summaryOnly ?? false)--}}
-{{--            <div class="summary-note">Summary view — individual transactions not shown</div>--}}
-{{--        @endif--}}
-
-        {{-- ══ Aging Table ══ --}}
+        {{-- ══ Consolidated Summary Table ══ --}}
         <table class="ag-table">
             <thead>
             <tr>
-                <th style="width:16%">Customer</th>
-                <th class="th-ref"  style="width:8%">Reference</th>
-                <th class="th-date" style="width:8%">Date</th>
-                <th class="th-days" style="width:4%">Days</th>
-                <th style="width:11%">Current</th>
-                <th style="width:11%">{{ $lB1 }}</th>
-                <th style="width:11%">{{ $lB2 }}</th>
-                <th style="width:11%">{{ $lB3 }}</th>
-                <th style="width:11%">{{ $lB4 }}</th>
-                <th style="width:9%">Total Balance</th>
+                <th style="width:28%">Customer</th>
+                <th style="width:14%">Current</th>
+                <th style="width:14%">{{ $lB1 }}</th>
+                <th style="width:14%">{{ $lB2 }}</th>
+                <th style="width:14%">{{ $lB3 }}</th>
+                <th style="width:14%">{{ $lB4 }}</th>
+                <th style="width:12%">Total Balance</th>
             </tr>
             </thead>
             <tbody>
-
-            {{-- Summary row --}}
-            <tr class="r-sum">
-                <td colspan="4">{{ $customer['name'] }}</td>
-                <td class="num">{{ number_format($customer['totals']['current']) }}</td>
-                <td class="num">{{ number_format($customer['totals']['b1']) }}</td>
-                <td class="num">{{ number_format($customer['totals']['b2']) }}</td>
-                <td class="num">{{ number_format($customer['totals']['b3']) }}</td>
-                <td class="num">{{ number_format($customer['totals']['b4']) }}</td>
-                <td class="num">{{ number_format($customer['totals']['balance']) }}</td>
-            </tr>
-
-            {{-- Detail rows (empty when summaryOnly) --}}
-            @foreach($customer['transactions'] as $tx)
-                @php
-                    $label   = $typeLabels[(int)$tx['type']] ?? ('Trans #' . $tx['type']);
-                    $ref     = $tx['reference'] ?? '';
-                    $txDate  = Carbon::parse($tx['tran_date'])->format('d/m/Y');
-                    $bal     = (float) $tx['balance'];
-                    $isNeg   = $bal < 0;
-                @endphp
+            @foreach($customers as $customer)
                 <tr class="r-det">
-                    <td>{{ $label }}</td>
-                    <td>{{ $ref }}</td>
-                    <td>{{ $txDate }}</td>
-                    <td class="ctr {{ $tx['days'] == 0 ? 'zero' : '' }}">
-                        {{ $tx['days'] > 0 ? $tx['days'] : '' }}
+                    <td>{{ $customer['name'] }}</td>
+                    <td class="num {{ $customer['totals']['current'] == 0 ? 'zero' : ($customer['totals']['current'] < 0 ? 'neg' : '') }}">
+                        {{ number_format($customer['totals']['current']) }}
                     </td>
-                    <td class="num {{ $tx['current'] == 0 ? 'zero' : ($tx['current'] < 0 ? 'neg' : '') }}">
-                        {{ number_format($tx['current']) }}
+                    <td class="num {{ $customer['totals']['b1'] == 0 ? 'zero' : ($customer['totals']['b1'] < 0 ? 'neg' : '') }}">
+                        {{ number_format($customer['totals']['b1']) }}
                     </td>
-                    <td class="num {{ $tx['b1'] == 0 ? 'zero' : ($tx['b1'] < 0 ? 'neg' : '') }}">
-                        {{ number_format($tx['b1']) }}
+                    <td class="num {{ $customer['totals']['b2'] == 0 ? 'zero' : ($customer['totals']['b2'] < 0 ? 'neg' : '') }}">
+                        {{ number_format($customer['totals']['b2']) }}
                     </td>
-                    <td class="num {{ $tx['b2'] == 0 ? 'zero' : ($tx['b2'] < 0 ? 'neg' : '') }}">
-                        {{ number_format($tx['b2']) }}
+                    <td class="num {{ $customer['totals']['b3'] == 0 ? 'zero' : ($customer['totals']['b3'] < 0 ? 'neg' : '') }}">
+                        {{ number_format($customer['totals']['b3']) }}
                     </td>
-                    <td class="num {{ $tx['b3'] == 0 ? 'zero' : ($tx['b3'] < 0 ? 'neg' : '') }}">
-                        {{ number_format($tx['b3']) }}
+                    <td class="num {{ $customer['totals']['b4'] == 0 ? 'zero' : ($customer['totals']['b4'] < 0 ? 'neg' : '') }}">
+                        {{ number_format($customer['totals']['b4']) }}
                     </td>
-                    <td class="num {{ $tx['b4'] == 0 ? 'zero' : ($tx['b4'] < 0 ? 'neg' : '') }}">
-                        {{ number_format($tx['b4']) }}
-                    </td>
-                    <td class="num {{ $isNeg ? 'neg' : '' }}">
-                        {{ number_format($bal) }}
+                    <td class="num {{ $customer['totals']['balance'] < 0 ? 'neg' : '' }}">
+                        {{ number_format($customer['totals']['balance']) }}
                     </td>
                 </tr>
             @endforeach
 
+            {{-- Grand total row (shown when 2+ customers) --}}
+            @if(count($customers) > 1)
+                <tr class="r-grand">
+                    <td>Grand Total &mdash; {{ count($customers) }} Customers</td>
+                    <td class="num">{{ number_format($grand['current']) }}</td>
+                    <td class="num">{{ number_format($grand['b1']) }}</td>
+                    <td class="num">{{ number_format($grand['b2']) }}</td>
+                    <td class="num">{{ number_format($grand['b3']) }}</td>
+                    <td class="num">{{ number_format($grand['b4']) }}</td>
+                    <td class="num">{{ number_format($grand['balance']) }}</td>
+                </tr>
+            @endif
             </tbody>
         </table>
 
-{{--        <div class="rpt-footer">--}}
-{{--            Generated: {{ now()->format('d M Y, H:i') }}--}}
-{{--            &nbsp;|&nbsp;--}}
-{{--            @if(isset($from) && $from)Period: {{ $from->format('d M Y') }} &ndash; @endif--}}
-{{--            Aging Date: {{ $to->format('d M Y') }}--}}
-{{--            &nbsp;|&nbsp;--}}
-{{--            Page {{ $i + 1 }} of {{ count($customers) }}--}}
-{{--        </div>--}}
-
     </div>
-@empty
-    <div class="empty-state">
-        No transactions found for the selected parameters.
-        @if($suppressZeros ?? false)
-            <br><span style="font-size:8pt;">(Suppress Zeros is on — try unchecking it)</span>
-        @endif
-    </div>
-@endforelse
 
-{{-- Grand Total (2+ customers) --}}
-@if(count($customers) > 1)
+@else
+
+    {{-- ══════════════════════════════════════════════════════════════════════
+         DETAIL MODE — one page per customer with full transaction rows
+    ══════════════════════════════════════════════════════════════════════ --}}
+    @foreach($customers as $i => $customer)
+        <div class="page-block">
+
+            {{-- Company Header --}}
+            <table class="co-table">
+                <tr>
+                    <td class="co-left">
+                        <div class="co-name">Lucky Snacks (Pvt.) Ltd</div>
+                        <div class="co-meta">
+                            4-KM Satluj Toll Plaza Bahawalpur Road<br>
+                            Lodhran, Punjab, Pakistan, Lodhran,59320<br>
+                            +92 333 666 3171<br>
+                            info@luckyfoods.net<br>
+                            http://luckyfoods.net
+                        </div>
+                    </td>
+                    <td class="co-right">
+                        @if(!empty($logoSrc))
+                            <img src="{{ $logoSrc }}" class="logo-img" alt="Lucky Snacks">
+                        @else
+                            <span style="font-size:7.5pt;color:#008C00;font-weight:bold;">Lucky Snacks<br>(Pvt.) Ltd</span>
+                        @endif
+                    </td>
+                </tr>
+            </table>
+
+            {{-- Salesman Banner --}}
+            @if(!empty($salesmanLabel) && $salesmanLabel !== 'All Salesmen')
+                <div class="salesman-banner">{{ strtoupper($salesmanLabel) }}</div>
+            @endif
+
+            {{-- Customer Banner --}}
+            <div class="customer-banner">{{ strtoupper($customer['name']) }}</div>
+
+            {{-- Period & Aging Date --}}
+            <div class="aging-label">
+                Period: {{ $from->format('d M Y') }} &ndash; {{ $to->format('d M Y') }}
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                Aging Date {{ $to->format('d-M-y') }}
+            </div>
+
+            {{-- ══ Aging Table ══ --}}
+            <table class="ag-table">
+                <thead>
+                <tr>
+                    <th style="width:16%">Customer</th>
+                    <th class="th-ref"  style="width:8%">Reference</th>
+                    <th class="th-date" style="width:8%">Date</th>
+                    <th class="th-days" style="width:4%">Days</th>
+                    <th style="width:11%">Current</th>
+                    <th style="width:11%">{{ $lB1 }}</th>
+                    <th style="width:11%">{{ $lB2 }}</th>
+                    <th style="width:11%">{{ $lB3 }}</th>
+                    <th style="width:11%">{{ $lB4 }}</th>
+                    <th style="width:9%">Total Balance</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {{-- Summary row --}}
+                <tr class="r-sum">
+                    <td colspan="4">{{ $customer['name'] }}</td>
+                    <td class="num">{{ number_format($customer['totals']['current']) }}</td>
+                    <td class="num">{{ number_format($customer['totals']['b1']) }}</td>
+                    <td class="num">{{ number_format($customer['totals']['b2']) }}</td>
+                    <td class="num">{{ number_format($customer['totals']['b3']) }}</td>
+                    <td class="num">{{ number_format($customer['totals']['b4']) }}</td>
+                    <td class="num">{{ number_format($customer['totals']['balance']) }}</td>
+                </tr>
+
+                {{-- Detail rows --}}
+                @foreach($customer['transactions'] as $tx)
+                    @php
+                        $label  = $typeLabels[(int)$tx['type']] ?? ('Trans #' . $tx['type']);
+                        $ref    = $tx['reference'] ?? '';
+                        $txDate = Carbon::parse($tx['tran_date'])->format('d/m/Y');
+                        $bal    = (float) $tx['balance'];
+                        $isNeg  = $bal < 0;
+                    @endphp
+                    <tr class="r-det">
+                        <td>{{ $label }}</td>
+                        <td>{{ $ref }}</td>
+                        <td>{{ $txDate }}</td>
+                        <td class="ctr {{ $tx['days'] == 0 ? 'zero' : '' }}">
+                            {{ $tx['days'] > 0 ? $tx['days'] : '' }}
+                        </td>
+                        <td class="num {{ $tx['current'] == 0 ? 'zero' : ($tx['current'] < 0 ? 'neg' : '') }}">
+                            {{ number_format($tx['current']) }}
+                        </td>
+                        <td class="num {{ $tx['b1'] == 0 ? 'zero' : ($tx['b1'] < 0 ? 'neg' : '') }}">
+                            {{ number_format($tx['b1']) }}
+                        </td>
+                        <td class="num {{ $tx['b2'] == 0 ? 'zero' : ($tx['b2'] < 0 ? 'neg' : '') }}">
+                            {{ number_format($tx['b2']) }}
+                        </td>
+                        <td class="num {{ $tx['b3'] == 0 ? 'zero' : ($tx['b3'] < 0 ? 'neg' : '') }}">
+                            {{ number_format($tx['b3']) }}
+                        </td>
+                        <td class="num {{ $tx['b4'] == 0 ? 'zero' : ($tx['b4'] < 0 ? 'neg' : '') }}">
+                            {{ number_format($tx['b4']) }}
+                        </td>
+                        <td class="num {{ $isNeg ? 'neg' : '' }}">
+                            {{ number_format($bal) }}
+                        </td>
+                    </tr>
+                @endforeach
+
+                </tbody>
+            </table>
+
+        </div>
+    @endforeach
+
+@endif
+
+{{-- Grand Total — detail mode only (summary mode has grand total inline in its table) --}}
+@if(count($customers) > 1 && !($summaryOnly ?? false))
     <div class="grand-wrap">
         <div class="grand-title">
             Grand Total &mdash; {{ count($customers) }} Customers

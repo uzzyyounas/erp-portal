@@ -58,21 +58,6 @@ class AgedCustomerController extends Controller
         return response()->json($rows);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // GET /reports/aged-customer-analysis/generate  —  stream PDF
-    //
-    // Aging parameters (all GET):
-    //   from            string  date    Start date
-    //   to              string  date    End / aging date
-    //   aging_d1        int             1st threshold  e.g. 30  → bucket "1-30 Days"
-    //   aging_d2        int             2nd threshold  e.g. 60  → bucket "31-60 Days"
-    //   aging_d3        int             3rd threshold  e.g. 90  → bucket "61-90 Days"
-    //   salesman_code   string          Filter by salesman (optional)
-    //   debtor_no       string          Filter by single customer (optional)
-    //   show_allocated  "1"|null        Show Also Allocated
-    //   summary_only    "1"|null        Summary Only
-    //   suppress_zeros  "1"|null        Suppress Zeros
-    // ─────────────────────────────────────────────────────────────────────────
     public function generate(Request $request)
     {
         $request->validate([
@@ -94,12 +79,6 @@ class AgedCustomerController extends Controller
         $to          = Carbon::parse($request->input('to'));
         $toDateStr   = $to->format('Y-m-d');
 
-        // ── Custom aging thresholds ───────────────────────────────────────
-        // Three thresholds create FOUR aging buckets:
-        //   Bucket 1: 1  →  d1          e.g. 1-30 Days
-        //   Bucket 2: d1+1 → d2         e.g. 31-60 Days
-        //   Bucket 3: d2+1 → d3         e.g. 61-90 Days
-        //   Bucket 4: over d3            e.g. Over 90 Days
         $d1 = (int) $request->input('aging_d1', self::DEFAULT_AGING_DAYS[0]);
         $d2 = (int) $request->input('aging_d2', self::DEFAULT_AGING_DAYS[1]);
         $d3 = (int) $request->input('aging_d3', self::DEFAULT_AGING_DAYS[2]);
