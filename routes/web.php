@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Reports\AgedCustomerController;
+use App\Http\Controllers\Reports\AgedSupplierController;
+use App\Http\Controllers\Reports\ProductSaleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
@@ -40,13 +42,30 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('reports')->name('reports.')->group(function () {
 
+        // ── Aged Customer Analysis ──────────────────────────────────────────
         Route::prefix('reports')->name('aged-customer-analysis.')->group(function () {
-            Route::get('/aged-customer-analysis', [AgedCustomerController::class, 'index'])->name('index');
+            Route::get('/aged-customer-analysis',           [AgedCustomerController::class, 'index'])->name('index');
             Route::get('/aged-customer-analysis/customers', [AgedCustomerController::class, 'customersBySalesman'])->name('customers');
-            Route::get('/aged-customer-analysis/generate', [AgedCustomerController::class, 'generate'])->name('generate');
+            Route::get('/aged-customer-analysis/generate',  [AgedCustomerController::class, 'generate'])->name('generate');
+        });
+
+        // ── Product Sale Report ─────────────────────────────────────────────
+        Route::prefix('reports')->name('product-sale.')->group(function () {
+            Route::get('/product-sale',           [ProductSaleController::class, 'index'])->name('index');
+            Route::get('/product-sale/customers', [ProductSaleController::class, 'customersBySalesman'])->name('customers');
+            Route::get('/product-sale/items',     [ProductSaleController::class, 'itemsByCategory'])->name('items');
+            Route::get('/product-sale/generate',  [ProductSaleController::class, 'generate'])->name('generate');
+        });
+
+        // ── Aged Supplier Analysis ──────────────────────────────────────────
+        Route::prefix('reports')->name('aged-supplier-analysis.')->group(function () {
+            Route::get('/aged-supplier-analysis',          [AgedSupplierController::class, 'index'])->name('index');
+            Route::get('/aged-supplier-analysis/generate', [AgedSupplierController::class, 'generate'])->name('generate');
         });
 
     });
+
+
 
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
