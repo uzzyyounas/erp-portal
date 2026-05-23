@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Reports;
 
+use App\Exports\AgedCustomerExport;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AgedCustomerController extends Controller
 {
@@ -70,6 +72,8 @@ class AgedCustomerController extends Controller
             'aging_d2.gt' => 'Period 2 must be greater than Period 1.',
             'aging_d3.gt' => 'Period 3 must be greater than Period 2.',
         ]);
+
+        $exportType = $request->input('export_type', 'pdf');
 
         $startTime = microtime(true);
 
@@ -245,6 +249,83 @@ class AgedCustomerController extends Controller
             $grand['b3']      += $c['totals']['b3'];
             $grand['b4']      += $c['totals']['b4'];
             $grand['balance'] += $c['totals']['balance'];
+        }
+
+        if ($exportType === 'excel') {
+
+            $rows = [];
+
+            // Heading Row
+            $rows[] = [
+                'Customer',
+                'Reference',
+                'Date',
+                'Days',
+                'Current',
+                $agingLabels['b1'],
+                $agingLabels['b2'],
+                $agingLabels['b3'],
+                $agingLabels['b4'],
+                'Total Balance'
+            ];
+
+            foreach ($customers as $customer) {
+
+                // Customer Summary Row
+                $rows[] = [
+                    $customer['name'],
+                    '',
+                    '',
+                    '',
+                    round($customer['totals']['current'], 2),
+                    round($customer['totals']['b1'], 2),
+                    round($customer['totals']['b2'], 2),
+                    round($customer['totals']['b3'], 2),
+                    round($customer['totals']['b4'], 2),
+                    round($customer['totals']['balance'], 2),
+                ];
+
+                // Transaction Rows
+                foreach ($customer['transactions'] as $tx) {
+
+                    $rows[] = [
+                        $tx['type'],
+                        $tx['reference'],
+                        $tx['tran_date'],
+                        $tx['days'],
+                        round($tx['current'], 2),
+                        round($tx['b1'], 2),
+                        round($tx['b2'], 2),
+                        round($tx['b3'], 2),
+                        round($tx['b4'], 2),
+                        round($tx['balance'], 2),
+                    ];
+                }
+
+                // Empty Row Between Customers
+//                $rows[] = ['', '', '', '', '', '', '', '', '', ''];
+            }
+
+                            $rows[] = ['', '', '', '', '', '', '', '', '', ''];
+
+            // Grand Total Row
+            $rows[] = [
+                'GRAND TOTAL',
+                '',
+                '',
+                '',
+                round($grand['current'], 2),
+                round($grand['b1'], 2),
+                round($grand['b2'], 2),
+                round($grand['b3'], 2),
+                round($grand['b4'], 2),
+                round($grand['balance'], 2),
+            ];
+
+            return Excel::download(
+                new AgedCustomerExport($rows),
+                'aged-customer-analysis.xlsx'
+            );
         }
 
         // ── Render PDF ────────────────────────────────────────────────────

@@ -392,9 +392,30 @@
                 <button type="button" class="btn-reset" id="resetBtn">
                     <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
                 </button>
-                <button type="submit" class="btn-generate" id="genBtn">
-                    <i class="bi bi-file-earmark-pdf"></i> Generate PDF Report
-                </button>
+{{--                <button type="submit" class="btn-generate" id="genBtn">--}}
+{{--                    <i class="bi bi-file-earmark-pdf"></i> Generate PDF Report--}}
+{{--                </button>--}}
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            name="export_type"
+                            value="pdf"
+                            class="btn-generate"
+                            id="genBtn">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        Generate PDF
+                    </button>
+
+                    <button type="submit"
+                            name="export_type"
+                            value="excel"
+                            class="btn-generate"
+                            id="excelBtn">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        Export Excel
+                    </button>
+
+                </div>
             </div>
 
         </form>
