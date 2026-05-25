@@ -512,6 +512,7 @@
             <a href="{{ route('admin.users.index') }}" class="nav-tool"><i class="bi bi-people-fill"></i> Users</a>
             <a href="{{ route('admin.roles.index') }}" class="nav-tool"><i class="bi bi-shield-fill"></i> Roles</a>
             <a href="{{ route('admin.modules.index') }}" class="nav-tool"><i class="bi bi-grid-3x3"></i> Setup</a>
+            <a href="{{ route('admin.menu-items.index') }}" class="nav-tool"><i class="bi bi-grid-3x3"></i> Menu Items</a>
         @endif
 {{--        <a href="{{ route('admin.company-settings.index') }}" class="nav-tool"><i class="bi bi-gear-fill"></i></a>--}}
     </div>

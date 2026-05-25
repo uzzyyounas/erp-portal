@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('title', isset($menuItem) ? 'Edit Menu Item' : 'Add Menu Item')
-@section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
-    <li class="breadcrumb-item"><a href="{{ route('admin.menu-items.index') }}">Menu Items</a></li>
-    <li class="breadcrumb-item active">{{ isset($menuItem) ? 'Edit' : 'Add' }}</li>
-@endsection
+{{--@section('breadcrumb')--}}
+{{--    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>--}}
+{{--    <li class="breadcrumb-item"><a href="{{ route('admin.menu-items.index') }}">Menu Items</a></li>--}}
+{{--    <li class="breadcrumb-item active">{{ isset($menuItem) ? 'Edit' : 'Add' }}</li>--}}
+{{--@endsection--}}
 
 @section('content')
 <div class="page-header">
