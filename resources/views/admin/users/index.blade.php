@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('title','Users')
-@section('breadcrumb')
-    <li class="breadcrumb-item active">Users</li>
-@endsection
+{{--@section('breadcrumb')--}}
+{{--    <li class="breadcrumb-item active">Users</li>--}}
+{{--@endsection--}}
 
 @section('content')
 <div class="page-header">

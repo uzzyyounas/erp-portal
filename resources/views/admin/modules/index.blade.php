@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Modules')
-@section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
-    <li class="breadcrumb-item active">Modules</li>
-@endsection
+{{--@section('breadcrumb')--}}
+{{--    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>--}}
+{{--    <li class="breadcrumb-item active">Modules</li>--}}
+{{--@endsection--}}
 
 @section('content')
 <div class="page-header">

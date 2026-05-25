@@ -169,13 +169,13 @@
     </style>
 @endpush
 
-@section('breadcrumb')
-    <li class="breadcrumb-item text-muted">Reports</li>
-    <li class="breadcrumb-item active">Product Sale Report</li>
-@endsection
+{{--@section('breadcrumb')--}}
+{{--    <li class="breadcrumb-item text-muted">Reports</li>--}}
+{{--    <li class="breadcrumb-item active">Product Sale Report</li>--}}
+{{--@endsection--}}
 
 @section('content')
-    <div class="container-fluid py-4">
+    <div class="container-fluid">
 
         <div class="page-header">
             <h4><i class="bi bi-bar-chart-steps me-2" style="color:#1a3a5c;"></i>Product Sale Report</h4>

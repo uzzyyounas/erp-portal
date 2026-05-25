@@ -212,10 +212,10 @@
     </style>
 @endpush
 
-@section('breadcrumb')
-    <li class="breadcrumb-item text-muted">Reports</li>
-    <li class="breadcrumb-item active">Aged Supplier Analysis</li>
-@endsection
+{{--@section('breadcrumb')--}}
+{{--    <li class="breadcrumb-item text-muted">Reports</li>--}}
+{{--    <li class="breadcrumb-item active">Aged Supplier Analysis</li>--}}
+{{--@endsection--}}
 
 @section('content')
 
