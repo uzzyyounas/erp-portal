@@ -324,7 +324,7 @@
             {{-- Top Sales Reps --}}
             <div class="portlet anim d4">
                 <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-person-badge-fill"></i> Top Salesmen by Sales (YTD)</div>
+                    <div class="portlet-hd-title"><i class="bi bi-person-badge-fill"></i> Top Salesmen by Sales</div>
                     <div class="portlet-hd-actions">
                         <div class="phd-btn"><i class="bi bi-arrows-angle-expand"></i></div>
                     </div>

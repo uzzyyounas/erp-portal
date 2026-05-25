@@ -511,10 +511,9 @@
         @if(auth()->user()?->isAdmin())
             <a href="{{ route('admin.users.index') }}" class="nav-tool"><i class="bi bi-people-fill"></i> Users</a>
             <a href="{{ route('admin.roles.index') }}" class="nav-tool"><i class="bi bi-shield-fill"></i> Roles</a>
-            <a href="{{ route('admin.modules.index') }}" class="nav-tool"><i class="bi bi-grid-3x3"></i> Setup</a>
-            <a href="{{ route('admin.menu-items.index') }}" class="nav-tool"><i class="bi bi-grid-3x3"></i> Menu Items</a>
+            <a href="{{ route('admin.modules.index') }}" class="nav-tool"><i class="bi bi-grid-3x3"></i> Modules</a>
+            <a href="{{ route('admin.menu-items.index') }}" class="nav-tool"><i class="bi bi-gear-fill"> Menu Item</i></a>
         @endif
-{{--        <a href="{{ route('admin.company-settings.index') }}" class="nav-tool"><i class="bi bi-gear-fill"></i></a>--}}
     </div>
 </nav>
 
@@ -553,195 +552,236 @@
     })();
 </script>
 
-@php
-    // Fallback: if $searchIndex wasn't passed (e.g. from non-dashboard controllers),
-    // build it on the fly from $sidebarModules which the SidebarComposer always provides.
-    if (!isset($searchIndex)) {
-        $searchIndex = isset($sidebarModules)
-            ? $sidebarModules
-                ->flatMap(fn($m) =>
-                    $m->activeMenuItems
-                        ->where('type', '!=', 'divider')
-                        ->map(fn($item) => [
-                            'name'   => $item->name,
-                            'url'    => $item->url,
-                            'type'   => $item->type,
-                            'icon'   => $item->icon ?: 'bi-file-text',
-                            'module' => $m->name,
-                            'color'  => $m->color,
-                        ])
-                )
-                ->values()
-                ->toArray()
-            : [];
-    }
-@endphp
-
 <script>
-    /* ═══════════════════════════════════════ LIVE SEARCH ENGINE */
+    /* ═══════════════════════════════════════════════════ LIVE SEARCH ENGINE
+       Queries /search?q=... via AJAX — works on every page without any
+       blade variable injection. Results come from the server filtered by
+       the authenticated user's permissions.
+    ================================================================== */
     (function () {
-        // Search index pre-built server-side (always a simple array here)
-        const menuIndex = @json($searchIndex);
+        const SEARCH_URL = '{{ route("search") }}';
+        const CSRF       = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
         const input    = document.getElementById('searchInput');
         const dropdown = document.getElementById('searchDropdown');
         const clearBtn = document.getElementById('searchClear');
-        let   hiIdx    = -1;
-        let   debounce = null;
 
-        if (!input) return;
+        if (!input || !dropdown) return;
 
-        /* ── Helpers ──────────────────────────────────────────── */
+        let hiIdx    = -1;
+        let debounce = null;
+        let lastQ    = '';
+        let cache    = {};          // simple query cache
+
+        /* ── Escape HTML ──────────────────────────────────────── */
         function esc(s) {
-            return String(s).replace(/[&<>"']/g, c =>
+            return String(s ?? '').replace(/[&<>"']/g, c =>
                 ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
-        function highlight(text, query) {
-            if (!query) return esc(text);
-            const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\]/g,'\$&')})`, 'gi');
-        return esc(text).replace(re, '<em>$1</em>');
-    }
+        /* ── Highlight matched substring ──────────────────────── */
+        function hl(text, q) {
+            if (!q) return esc(text);
+            const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return esc(text).replace(
+                new RegExp(`(${safe})`, 'gi'),
+                '<mark style="background:#ddeeff;color:#1a3a5c;border-radius:2px;padding:0 1px;">$1</mark>'
+            );
+        }
 
-    function typeIcon(type) {
-        return type === 'report' ? 'bi-bar-chart-line'
-             : type === 'form'   ? 'bi-pencil-square'
-             :                     'bi-link-45deg';
-    }
+        /* ── Type → icon/class helpers ────────────────────────── */
+        function typeIcon(type) {
+            return type === 'report' ? 'bi-bar-chart-line'
+                : type === 'form'   ? 'bi-pencil-square'
+                    :                     'bi-link-45deg';
+        }
+        function typeClass(type) {
+            return type === 'report' ? 'report'
+                : type === 'form'   ? 'form'
+                    :                     'link';
+        }
 
-    /* ── Core search ──────────────────────────────────────── */
-    function doSearch(q) {
-        q = q.trim().toLowerCase();
-        dropdown.innerHTML = '';
-        hiIdx = -1;
-
-        if (!q) { close(); return; }
-
-        // Filter
-        const results = menuIndex.filter(item =>
-            item.name.toLowerCase().includes(q) ||
-            item.module.toLowerCase().includes(q)
-        );
-
-        if (results.length === 0) {
-            dropdown.innerHTML = `
+        /* ── Render results ───────────────────────────────────── */
+        function render(results, q) {
+            hiIdx = -1;
+            if (!results.length) {
+                dropdown.innerHTML = `
                 <div class="sd-empty">
                     <i class="bi bi-search"></i>
                     No results for <strong>"${esc(q)}"</strong>
+                    <div style="font-size:.68rem;margin-top:4px;color:#b0bec5;">
+                        Try a different keyword or check the module name.
+                    </div>
                 </div>`;
-            open();
-            return;
-        }
+                openDrop();
+                return;
+            }
 
-        // Group by module
-        const byModule = {};
-        results.forEach(r => {
-            if (!byModule[r.module]) byModule[r.module] = [];
-            byModule[r.module].push(r);
+            /* Group by module */
+            const groups = {};
+            results.forEach(item => {
+                if (!groups[item.module]) groups[item.module] = [];
+                groups[item.module].push(item);
             });
 
-        let html = '';
-        Object.entries(byModule).forEach(([mod, items]) => {
-            html += `<div class="sd-section-hd">${esc(mod)}</div>`;
-            items.forEach((item, idx) => {
-                const typeClass = item.type === 'report' ? 'report'
-                                : item.type === 'form'   ? 'form' : 'link';
-                html += `
-            <a class="sd-item" href="${esc(item.url)}" data-idx="${idx}" role="option">
-                <div class="sd-item-icon type-${typeClass}">
-                <i class="bi ${esc(item.icon)}"></i>
-        </div>
-            <div class="sd-item-body">
-                <div class="sd-item-name">${highlight(item.name, q)}</div>
-                <div class="sd-item-meta">${esc(item.module)}</div>
-            </div>
-            <span class="sd-type-tag ${typeClass}">${esc(item.type)}</span>
-        </a>`;
+            let html = '';
+            Object.entries(groups).forEach(([mod, items]) => {
+                html += `<div class="sd-section-hd">${esc(mod)}</div>`;
+                items.forEach(item => {
+                    const tc = typeClass(item.type);
+                    html += `
+                <a class="sd-item" href="${esc(item.url)}" role="option">
+                    <div class="sd-item-icon type-${tc}">
+                        <i class="bi ${esc(item.icon)}"></i>
+                    </div>
+                    <div class="sd-item-body">
+                        <div class="sd-item-name">${hl(item.name, q)}</div>
+                        <div class="sd-item-meta">${esc(item.module)}</div>
+                    </div>
+                    <span class="sd-type-tag ${tc}">${esc(item.type)}</span>
+                </a>`;
+                });
             });
-        });
 
-        html += `
+            html += `
             <div class="sd-footer">
                 <span class="sd-kbd">↑↓</span> navigate &nbsp;
-            <span class="sd-kbd">↵</span> open &nbsp;
-            <span class="sd-kbd">Esc</span> close
-            &nbsp;·&nbsp; ${results.length} result${results.length !== 1 ? 's' : ''}
-        </div>`;
+                <span class="sd-kbd">↵</span> open &nbsp;
+                <span class="sd-kbd">Esc</span> close &nbsp;·&nbsp;
+                ${results.length} result${results.length !== 1 ? 's' : ''}
+            </div>`;
 
-        dropdown.innerHTML = html;
-        open();
-    }
+            dropdown.innerHTML = html;
+            openDrop();
+        }
 
-    /* ── Open / close ─────────────────────────────────────── */
-    function open()  { dropdown.classList.add('open'); }
-    function close() { dropdown.classList.remove('open'); hiIdx = -1; }
+        /* ── Render loading state ─────────────────────────────── */
+        function renderLoading() {
+            dropdown.innerHTML = `
+            <div class="sd-empty">
+                <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                <div>Searching…</div>
+            </div>`;
+            openDrop();
+        }
 
-    /* ── Keyboard navigation ───────────────────────────────── */
-    input.addEventListener('keydown', e => {
-        const items = dropdown.querySelectorAll('.sd-item');
-        if (!items.length) return;
+        /* ── Render error ─────────────────────────────────────── */
+        function renderError() {
+            dropdown.innerHTML = `
+            <div class="sd-empty">
+                <i class="bi bi-exclamation-triangle" style="color:#e65100;"></i>
+                Could not fetch results. Please try again.
+            </div>`;
+            openDrop();
+        }
 
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            hiIdx = Math.min(hiIdx + 1, items.length - 1);
-            updateHighlight(items);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            hiIdx = Math.max(hiIdx - 1, 0);
-            updateHighlight(items);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (hiIdx >= 0 && items[hiIdx]) {
-                items[hiIdx].click();
+        /* ── Open / close ─────────────────────────────────────── */
+        function openDrop()  { dropdown.classList.add('open'); }
+        function closeDrop() { dropdown.classList.remove('open'); hiIdx = -1; }
+
+        /* ── AJAX fetch with cache ────────────────────────────── */
+        function fetchResults(q) {
+            if (cache[q]) { render(cache[q], q); return; }
+
+            renderLoading();
+
+            fetch(`${SEARCH_URL}?q=${encodeURIComponent(q)}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN':     CSRF,
+                    'Accept':           'application/json',
+                },
+                credentials: 'same-origin',
+            })
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
+                .then(data => {
+                    cache[q] = data;
+                    render(data, q);
+                })
+                .catch(() => renderError());
+        }
+
+        /* ── Keyboard navigation ──────────────────────────────── */
+        function getItems() { return Array.from(dropdown.querySelectorAll('.sd-item')); }
+
+        function updateHighlight(items) {
+            items.forEach((el, i) => el.classList.toggle('highlighted', i === hiIdx));
+            if (hiIdx >= 0) items[hiIdx].scrollIntoView({ block: 'nearest' });
+        }
+
+        input.addEventListener('keydown', e => {
+            const items = getItems();
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                hiIdx = Math.min(hiIdx + 1, items.length - 1);
+                updateHighlight(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                hiIdx = Math.max(hiIdx - 1, 0);
+                updateHighlight(items);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (hiIdx >= 0 && items[hiIdx]) items[hiIdx].click();
+            } else if (e.key === 'Escape') {
+                closeDrop();
+                input.blur();
             }
-        } else if (e.key === 'Escape') {
-            close();
-            input.blur();
-        }
-    });
+        });
 
-    function updateHighlight(items) {
-        items.forEach((el, i) => el.classList.toggle('highlighted', i === hiIdx));
-        if (hiIdx >= 0) items[hiIdx].scrollIntoView({ block: 'nearest' });
-    }
+        /* ── Input handler ────────────────────────────────────── */
+        input.addEventListener('input', () => {
+            const q = input.value.trim();
+            clearBtn.style.display = input.value ? 'block' : 'none';
 
-    /* ── Input events ─────────────────────────────────────── */
-    input.addEventListener('input', () => {
-        const q = input.value;
-        clearBtn.style.display = q ? 'block' : 'none';
-        clearTimeout(debounce);
-        debounce = setTimeout(() => doSearch(q), 160);
-    });
+            if (q === lastQ) return;
+            lastQ = q;
 
-    input.addEventListener('focus', () => {
-        if (input.value.trim()) open();
-    });
+            clearTimeout(debounce);
 
-    clearBtn.addEventListener('click', () => {
-        input.value = '';
-        clearBtn.style.display = 'none';
-        close();
-        input.focus();
-    });
+            if (q.length < 1) { closeDrop(); return; }
 
-    /* ── Close on outside click ───────────────────────────── */
-    document.addEventListener('click', e => {
-        if (!document.getElementById('globalSearch')?.contains(e.target)) {
-            close();
-        }
-    });
+            /* Instant render from cache, else debounce */
+            if (cache[q]) {
+                render(cache[q], q);
+            } else {
+                debounce = setTimeout(() => fetchResults(q), 220);
+            }
+        });
 
-    /* ── Keyboard shortcut: / to focus search ─────────────── */
-    document.addEventListener('keydown', e => {
-        if (e.key === '/' && document.activeElement !== input
-            && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
-            e.preventDefault();
+        /* ── Refocus shows last results ───────────────────────── */
+        input.addEventListener('focus', () => {
+            if (input.value.trim().length >= 1) openDrop();
+        });
+
+        /* ── Clear button ─────────────────────────────────────── */
+        clearBtn.addEventListener('click', () => {
+            input.value = '';
+            clearBtn.style.display = 'none';
+            lastQ = '';
+            closeDrop();
             input.focus();
-            input.select();
-        }
-    });
+        });
 
-})();
+        /* ── Close on outside click ───────────────────────────── */
+        document.addEventListener('click', e => {
+            if (!document.getElementById('globalSearch')?.contains(e.target)) closeDrop();
+        });
+
+        /* ── Press "/" to focus ───────────────────────────────── */
+        document.addEventListener('keydown', e => {
+            if (e.key === '/'
+                && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)
+                && document.activeElement !== input) {
+                e.preventDefault();
+                input.focus();
+                input.select();
+            }
+        });
+
+    })();
 </script>
 
 @stack('scripts')

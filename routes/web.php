@@ -4,6 +4,7 @@ use App\Http\Controllers\Reports\AgedCustomerController;
 use App\Http\Controllers\Reports\AgedSupplierController;
 use App\Http\Controllers\Reports\ItemLedgerController;
 use App\Http\Controllers\Reports\ProductSaleController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
@@ -29,6 +30,8 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
+
+Route::get('/search', SearchController::class)->name('search');
 
 /*
 |--------------------------------------------------------------------------
