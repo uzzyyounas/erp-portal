@@ -404,496 +404,6 @@
 
     </style>
 
-    <script>
-        /* ═══════════════════════════════════════ PORTLET EXPAND ENGINE */
-        (function () {
-
-            /* ── Server data snapshots ──────────────────────────────── */
-            const DATA = {
-                customers:   @json(collect($topCustomers)->map(fn($c) => ['name'=>$c->name, 'total'=>$c->total])->values()),
-                salesmen:    @json(collect($topCustomers)->map(fn($c) => ['name'=>$c->name, 'total'=>$c->total])->values()),
-                categories:  @json(collect($salesByCategory)->map(fn($c) => ['name'=>$c->category ?: 'Other', 'total'=>$c->total])->values()),
-                trend: {
-                    labels:    @json($chartLabels),
-                    sales:     @json($chartSales),
-                    purchases: @json($chartPurchases),
-                    gp:        @json($chartGP),
-                },
-            };
-
-            const PALETTE = ['#1565c0','#2e7d32','#e65100','#6a1b9a','#c62828','#00695c','#f57f17','#4527a0','#ad1457'];
-
-            /* ── DOM refs ───────────────────────────────────────────── */
-            const overlay  = document.getElementById('expOverlay');
-            const modal    = document.getElementById('expModal');
-            const body     = document.getElementById('expModalBody');
-            const titleEl  = document.getElementById('expModalTitle');
-            const subEl    = document.getElementById('expModalSub');
-            const iconEl   = document.getElementById('expModalIcon').querySelector('i');
-            const tabsEl   = document.getElementById('expTabs');
-            const closeBtn = document.getElementById('expClose');
-
-            let activeChart = null;
-            let currentConfig = null;
-            let activeTab  = 'chart';
-
-            /* ── Format helpers ─────────────────────────────────────── */
-            const fmtF = v => new Intl.NumberFormat().format(Math.round(v));
-            const fmtK = v => v >= 1e6
-                ? (v/1e6).toFixed(2)+'M'
-                : v >= 1e3 ? (v/1e3).toFixed(1)+'K'
-                    : Math.round(v).toString();
-            const fmtC = v => new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(v);
-
-            /* ── Config registry ─────────────────────────────────────── */
-            function getConfig(key) {
-                const configs = {
-
-                    /* ──── Customers ──────────────────────────────────── */
-                    customers: {
-                        title:   'Top Customers by Sales',
-                        sub:     'Year-to-date ranking by gross invoice value',
-                        icon:    'bi-people-fill',
-                        tabs:    ['chart','table'],
-                        stats() {
-                            const d = DATA.customers;
-                            const total = d.reduce((a,r)=>a+r.total,0);
-                            const top   = d[0] || {};
-                            return [
-                                { label:'Total (Top 5)',  val: fmtK(total),       color:'#1565c0' },
-                                { label:'#1 Customer',    val: top.name?.split(' ')[0]??'—', color:'#2e7d32' },
-                                { label:'#1 Sales',       val: fmtK(top.total??0), color:'#e65100' },
-                                { label:'Avg per Customer',val: fmtK(d.length ? total/d.length : 0), color:'#6a1b9a' },
-                            ];
-                        },
-                        renderChart(canvas) {
-                            const d = DATA.customers;
-                            return new Chart(canvas, {
-                                type: 'bar',
-                                data: {
-                                    labels: d.map(r=>r.name),
-                                    datasets: [{
-                                        label: 'Sales',
-                                        data:  d.map(r=>r.total),
-                                        backgroundColor: d.map((_,i)=>PALETTE[i]+'cc'),
-                                        borderColor:     d.map((_,i)=>PALETTE[i]),
-                                        borderWidth: 1,
-                                        borderRadius: 5,
-                                        borderSkipped: false,
-                                    }]
-                                },
-                                options: chartOpts('Sales by Customer')
-                            });
-                        },
-                        renderTable() {
-                            const d = DATA.customers;
-                            const max = Math.max(...d.map(r=>r.total), 1);
-                            return tableHTML(
-                                ['#','Customer Name','Sales (Total)','Share','Bar'],
-                                d.map((r,i) => [
-                                    `<span class="rank-badge ${i===0?'g1':i===1?'g2':i===2?'g3':''}">${i+1}</span>`,
-                                    `<strong>${r.name}</strong>`,
-                                    `<span class="val-mono">${fmtF(r.total)}</span>`,
-                                    `<span style="font-size:.72rem;color:#64748b;">${((r.total/Math.max(...d.map(x=>x.total),1))*100).toFixed(1)}%</span>`,
-                                    `<div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:${((r.total/max)*100).toFixed(1)}%;background:${PALETTE[i]};"></div></div></div>`
-                                ])
-                            );
-                        }
-                    },
-
-                    /* ──── Top Salesmen ───────────────────────────────── */
-                    salesmen: {
-                        title:   'Top Salesmen by Sales',
-                        sub:     'Year-to-date ranking by gross invoice value',
-                        icon:    'bi-person-badge-fill',
-                        tabs:    ['chart','table'],
-                        stats() {
-                            const d = DATA.salesmen;
-                            const total = d.reduce((a,r)=>a+r.total,0);
-                            const top   = d[0] || {};
-                            return [
-                                { label:'Total (Top 5)',  val: fmtK(total),       color:'#1565c0' },
-                                { label:'Top Performer',  val: top.name?.split(' ')[0]??'—', color:'#2e7d32' },
-                                { label:'Top Sales',      val: fmtK(top.total??0), color:'#e65100' },
-                                { label:'Avg per Salesman',val: fmtK(d.length ? total/d.length : 0), color:'#6a1b9a' },
-                            ];
-                        },
-                        renderChart(canvas) {
-                            const d = DATA.salesmen;
-                            return new Chart(canvas, {
-                                type: 'bar',
-                                data: {
-                                    labels: d.map(r=>r.name),
-                                    datasets: [{
-                                        label: 'Sales',
-                                        data:  d.map(r=>r.total),
-                                        backgroundColor: d.map((_,i)=>PALETTE[i]+'cc'),
-                                        borderColor:     d.map((_,i)=>PALETTE[i]),
-                                        borderWidth: 1, borderRadius: 5, borderSkipped: false,
-                                    }]
-                                },
-                                options: chartOpts('Sales by Salesman')
-                            });
-                        },
-                        renderTable() {
-                            const d = DATA.salesmen;
-                            const max = Math.max(...d.map(r=>r.total),1);
-                            return tableHTML(
-                                ['#','Salesman','Sales (Total)','Share','Bar'],
-                                d.map((r,i)=>[
-                                    `<span class="rank-badge ${i===0?'g1':i===1?'g2':i===2?'g3':''}">${i+1}</span>`,
-                                    `<strong>${r.name}</strong>`,
-                                    `<span class="val-mono">${fmtF(r.total)}</span>`,
-                                    `<span style="font-size:.72rem;color:#64748b;">${((r.total/max)*100).toFixed(1)}%</span>`,
-                                    `<div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:${((r.total/max)*100).toFixed(1)}%;background:${PALETTE[i]};"></div></div></div>`
-                                ])
-                            );
-                        }
-                    },
-
-                    /* ──── Sales by Category ──────────────────────────── */
-                    categories: {
-                        title:   'Sales by Category',
-                        sub:     'Year-to-date breakdown by inventory category',
-                        icon:    'bi-pie-chart-fill',
-                        tabs:    ['chart','table'],
-                        stats() {
-                            const d = DATA.categories;
-                            const total = d.reduce((a,r)=>a+r.total,0);
-                            const top   = d[0] || {};
-                            return [
-                                { label:'Total Sales',    val: fmtK(total),              color:'#1565c0' },
-                                { label:'Top Category',   val: top.name??'—',            color:'#2e7d32' },
-                                { label:'Top Value',      val: fmtK(top.total??0),       color:'#e65100' },
-                                { label:'Categories',     val: d.length.toString(),      color:'#6a1b9a' },
-                            ];
-                        },
-                        renderChart(canvas) {
-                            const d = DATA.categories;
-                            return new Chart(canvas, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: d.map(r=>r.name),
-                                    datasets: [{
-                                        data:            d.map(r=>r.total),
-                                        backgroundColor: PALETTE.slice(0, d.length),
-                                        borderColor:     '#fff', borderWidth: 3,
-                                        hoverOffset: 10,
-                                    }]
-                                },
-                                options: {
-                                    responsive: true, maintainAspectRatio: true,
-                                    cutout: '55%',
-                                    plugins: {
-                                        legend: { position:'right', labels:{ font:{size:11}, padding:14, boxWidth:14, boxHeight:14 } },
-                                        tooltip: {
-                                            backgroundColor:'#1a2332', padding:10, cornerRadius:7,
-                                            callbacks:{ label:c=>'  '+c.label+': '+fmtF(c.raw) }
-                                        }
-                                    }
-                                }
-                            });
-                        },
-                        renderTable() {
-                            const d = DATA.categories;
-                            const max = Math.max(...d.map(r=>r.total),1);
-                            const total = d.reduce((a,r)=>a+r.total,0)||1;
-                            return tableHTML(
-                                ['#','Category','Net Sales','Share of Total','Bar'],
-                                d.map((r,i)=>[
-                                    `<span class="rank-badge ${i===0?'g1':i===1?'g2':i===2?'g3':''}">${i+1}</span>`,
-                                    `<span style="display:flex;align-items:center;gap:7px;"><span style="width:10px;height:10px;border-radius:3px;background:${PALETTE[i]};flex-shrink:0;display:inline-block;"></span><strong>${r.name}</strong></span>`,
-                                    `<span class="val-mono">${fmtF(r.total)}</span>`,
-                                    `<span class="val-mono">${((r.total/total)*100).toFixed(1)}%</span>`,
-                                    `<div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:${((r.total/max)*100).toFixed(1)}%;background:${PALETTE[i]};"></div></div></div>`
-                                ])
-                            );
-                        }
-                    },
-
-                    /* ──── Monthly Trend ──────────────────────────────── */
-                    trend: {
-                        title:   'Monthly Sales Trend',
-                        sub:     'Sales · Purchases · Gross Profit — last 7 months',
-                        icon:    'bi-bar-chart-line-fill',
-                        tabs:    ['chart','table'],
-                        stats() {
-                            const s = DATA.trend.sales;
-                            const p = DATA.trend.purchases;
-                            const g = DATA.trend.gp;
-                            const totalS = s.reduce((a,v)=>a+v,0);
-                            const totalP = p.reduce((a,v)=>a+v,0);
-                            const totalG = g.reduce((a,v)=>a+v,0);
-                            return [
-                                { label:'Total Sales (7mo)',     val: fmtK(totalS), color:'#1565c0' },
-                                { label:'Total Purchases (7mo)', val: fmtK(totalP), color:'#e65100' },
-                                { label:'Total GP (7mo)',         val: fmtK(totalG), color:'#2e7d32' },
-                                { label:'Avg Monthly Sales',     val: fmtK(s.length ? totalS/s.length : 0), color:'#6a1b9a' },
-                            ];
-                        },
-                        renderChart(canvas) {
-                            const t = DATA.trend;
-                            const ctx = canvas.getContext('2d');
-                            const sg = ctx.createLinearGradient(0,0,0,300);
-                            sg.addColorStop(0,'rgba(21,101,192,.7)'); sg.addColorStop(1,'rgba(21,101,192,.2)');
-                            const pg = ctx.createLinearGradient(0,0,0,300);
-                            pg.addColorStop(0,'rgba(230,81,0,.6)');  pg.addColorStop(1,'rgba(230,81,0,.1)');
-                            return new Chart(canvas, {
-                                data: {
-                                    labels: t.labels,
-                                    datasets: [
-                                        { type:'bar',  label:'Sales',        data:t.sales,     backgroundColor:sg, borderRadius:5, borderSkipped:false, order:2 },
-                                        { type:'bar',  label:'Purchases',    data:t.purchases, backgroundColor:pg, borderRadius:5, borderSkipped:false, order:2 },
-                                        { type:'line', label:'Gross Profit', data:t.gp,
-                                            borderColor:'#2e7d32', backgroundColor:'rgba(46,125,50,.08)',
-                                            pointBackgroundColor:'#2e7d32', pointRadius:5,
-                                            pointHoverRadius:7, borderWidth:2.5, tension:.4, fill:true, order:1 },
-                                    ]
-                                },
-                                options: {
-                                    responsive:true, maintainAspectRatio:true,
-                                    interaction:{ mode:'index', intersect:false },
-                                    plugins:{
-                                        legend:{ position:'top', labels:{ font:{size:11}, padding:14, boxWidth:14, boxHeight:14 } },
-                                        tooltip:{ backgroundColor:'#1a2332', padding:10, cornerRadius:7,
-                                            callbacks:{ label:c=>'  '+c.dataset.label+': '+fmtF(c.raw) } }
-                                    },
-                                    scales:{
-                                        x:{ grid:{display:false}, border:{display:false},
-                                            ticks:{ font:{size:11, weight:'600'}, color:'#94a3b8' } },
-                                        y:{ grid:{color:'#edf1f9'}, border:{display:false},
-                                            ticks:{ font:{family:"'JetBrains Mono',monospace", size:10}, color:'#94a3b8', callback:fmtC, maxTicksLimit:6 } }
-                                    }
-                                }
-                            });
-                        },
-                        renderTable() {
-                            const t = DATA.trend;
-                            return tableHTML(
-                                ['Month','Sales','Purchases','Gross Profit','GP Margin'],
-                                t.labels.map((lbl,i) => {
-                                    const gpm = t.sales[i] > 0 ? ((t.gp[i]/t.sales[i])*100).toFixed(1)+'%' : '—';
-                                    return [
-                                        `<strong>${lbl}</strong>`,
-                                        `<span class="val-mono">${fmtF(t.sales[i])}</span>`,
-                                        `<span class="val-mono">${fmtF(t.purchases[i])}</span>`,
-                                        `<span class="val-mono" style="color:#2e7d32;">${fmtF(t.gp[i])}</span>`,
-                                        `<span class="val-mono">${gpm}</span>`
-                                    ];
-                                })
-                            );
-                        }
-                    },
-
-                    /* ──── Comparative Sales ──────────────────────────── */
-                    comparative: {
-                        title:   'Comparative Sales',
-                        sub:     'This Year vs Last Year — monthly comparison',
-                        icon:    'bi-bar-chart-fill',
-                        tabs:    ['chart','table'],
-                        stats() {
-                            const s = DATA.trend.sales;
-                            const totalS = s.reduce((a,v)=>a+v,0);
-                            const lastY  = s.map(v=>v*0.78);
-                            const totalL = lastY.reduce((a,v)=>a+v,0);
-                            const change = totalL > 0 ? ((totalS-totalL)/totalL*100).toFixed(1) : '—';
-                            return [
-                                { label:'This Year (7mo)',  val: fmtK(totalS), color:'#1565c0' },
-                                { label:'Last Year (est)',  val: fmtK(totalL), color:'#e65100' },
-                                { label:'Growth %',         val: change+'%',   color:change>0?'#2e7d32':'#c62828' },
-                                { label:'Months Shown',     val: s.length.toString(), color:'#6a1b9a' },
-                            ];
-                        },
-                        renderChart(canvas) {
-                            const t = DATA.trend;
-                            const lastY = t.sales.map(v=>v*0.78+(Math.random()-.5)*v*.05);
-                            return new Chart(canvas, {
-                                type:'line',
-                                data:{
-                                    labels:t.labels,
-                                    datasets:[
-                                        { label:'This Year', data:t.sales, borderColor:'#1565c0',
-                                            backgroundColor:'rgba(21,101,192,.08)', pointBackgroundColor:'#1565c0',
-                                            pointRadius:4, borderWidth:2.5, tension:.4, fill:true },
-                                        { label:'Last Year', data:lastY, borderColor:'#e65100',
-                                            backgroundColor:'transparent', pointBackgroundColor:'#e65100',
-                                            pointRadius:3, borderWidth:2, tension:.4, borderDash:[5,4] },
-                                    ]
-                                },
-                                options:{
-                                    responsive:true, maintainAspectRatio:true,
-                                    interaction:{ mode:'index', intersect:false },
-                                    plugins:{
-                                        legend:{ position:'top', labels:{ font:{size:11}, padding:14, boxWidth:14, boxHeight:14 } },
-                                        tooltip:{ backgroundColor:'#1a2332', padding:10, cornerRadius:7,
-                                            callbacks:{ label:c=>'  '+c.dataset.label+': '+fmtF(c.raw) } }
-                                    },
-                                    scales:{
-                                        x:{ grid:{display:false}, border:{display:false},
-                                            ticks:{ font:{size:11,weight:'600'}, color:'#94a3b8' } },
-                                        y:{ grid:{color:'#edf1f9'}, border:{display:false},
-                                            ticks:{ font:{family:"'JetBrains Mono',monospace",size:10}, color:'#94a3b8',
-                                                callback:fmtC, maxTicksLimit:6 } }
-                                    }
-                                }
-                            });
-                        },
-                        renderTable() {
-                            const t = DATA.trend;
-                            const lastY = t.sales.map(v=>v*0.78);
-                            return tableHTML(
-                                ['Month','This Year','Last Year (Est.)','Difference','Growth'],
-                                t.labels.map((lbl,i)=>{
-                                    const diff = t.sales[i]-lastY[i];
-                                    const pct  = lastY[i]>0 ? ((diff/lastY[i])*100).toFixed(1)+'%':'—';
-                                    const up   = diff >= 0;
-                                    return [
-                                        `<strong>${lbl}</strong>`,
-                                        `<span class="val-mono">${fmtF(t.sales[i])}</span>`,
-                                        `<span class="val-mono">${fmtF(lastY[i])}</span>`,
-                                        `<span class="val-mono" style="color:${up?'#2e7d32':'#c62828'};">${up?'+':''}${fmtF(diff)}</span>`,
-                                        `<span style="font-weight:700;color:${up?'#2e7d32':'#c62828'};">${up?'↑':'↓'}${pct}</span>`
-                                    ];
-                                })
-                            );
-                        }
-                    },
-                };
-
-                return configs[key] ?? null;
-            }
-
-            /* ── Shared chart options ────────────────────────────────── */
-            function chartOpts(label) {
-                return {
-                    responsive:true, maintainAspectRatio:true,
-                    interaction:{ mode:'index', intersect:false },
-                    plugins:{
-                        legend:{ display:false },
-                        tooltip:{ backgroundColor:'#1a2332', padding:10, cornerRadius:7,
-                            callbacks:{ label:c=>'  '+c.dataset.label+': '+fmtF(c.raw) } }
-                    },
-                    scales:{
-                        x:{ grid:{display:false}, border:{display:false},
-                            ticks:{ font:{size:11,weight:'600'}, color:'#94a3b8', maxRotation:30 } },
-                        y:{ grid:{color:'#edf1f9'}, border:{display:false},
-                            ticks:{ font:{family:"'JetBrains Mono',monospace",size:10}, color:'#94a3b8',
-                                callback:v=>new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(v),
-                                maxTicksLimit:6 } }
-                    }
-                };
-            }
-
-            /* ── Table builder ───────────────────────────────────────── */
-            function tableHTML(headers, rows) {
-                const ths = headers.map(h=>`<th>${h}</th>`).join('');
-                const trs = rows.map(cols=>`<tr>${cols.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
-                return `<div style="overflow-x:auto;"><table class="exp-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div>`;
-            }
-
-            /* ── Stats pills builder ─────────────────────────────────── */
-            function statsHTML(stats) {
-                return `<div class="exp-stats">${stats.map(s=>`
-            <div class="exp-stat" style="border-left-color:${s.color};">
-                <div class="exp-stat-val" style="color:${s.color};">${s.val}</div>
-                <div class="exp-stat-lbl">${s.label}</div>
-            </div>`).join('')}</div>`;
-            }
-
-            /* ── Render a tab ─────────────────────────────────────────── */
-            function renderTab(tab) {
-                if (!currentConfig) return;
-                activeTab = tab;
-
-                // Update tab highlight
-                tabsEl.querySelectorAll('.exp-tab').forEach(t =>
-                    t.classList.toggle('active', t.dataset.tab === tab)
-                );
-
-                // Destroy previous chart
-                if (activeChart) { activeChart.destroy(); activeChart = null; }
-
-                const stats = statsHTML(currentConfig.stats());
-
-                if (tab === 'chart') {
-                    body.innerHTML = stats + `<div class="exp-chart-wrap"><canvas id="expCanvas" height="260"></canvas></div>`;
-                    requestAnimationFrame(() => {
-                        activeChart = currentConfig.renderChart(document.getElementById('expCanvas'));
-                    });
-                } else {
-                    body.innerHTML = stats + currentConfig.renderTable();
-                    // Animate bars
-                    requestAnimationFrame(() => {
-                        document.querySelectorAll('.bar-fill').forEach(el => {
-                            const w = el.style.width;
-                            el.style.width = '0';
-                            requestAnimationFrame(() => { el.style.width = w; });
-                        });
-                    });
-                }
-            }
-
-            /* ── Open modal ──────────────────────────────────────────── */
-            function openModal(key) {
-                currentConfig = getConfig(key);
-                if (!currentConfig) return;
-
-                // Header
-                titleEl.textContent = currentConfig.title;
-                subEl.textContent   = currentConfig.sub;
-                iconEl.className    = 'bi ' + currentConfig.icon;
-
-                // Tabs (show only what's defined)
-                tabsEl.querySelectorAll('.exp-tab').forEach(t => {
-                    t.style.display = currentConfig.tabs.includes(t.dataset.tab) ? '' : 'none';
-                });
-
-                // First tab
-                renderTab('chart');
-
-                overlay.classList.add('open');
-                document.body.style.overflow = 'hidden';
-            }
-
-            /* ── Close modal ─────────────────────────────────────────── */
-            function closeModal() {
-                overlay.classList.remove('open');
-                document.body.style.overflow = '';
-                if (activeChart) { activeChart.destroy(); activeChart = null; }
-                currentConfig = null;
-            }
-
-            /* ── Tab switching ───────────────────────────────────────── */
-            tabsEl.addEventListener('click', e => {
-                const btn = e.target.closest('.exp-tab');
-                if (btn && btn.dataset.tab !== activeTab) renderTab(btn.dataset.tab);
-            });
-
-            /* ── Trigger wiring ──────────────────────────────────────── */
-            document.querySelectorAll('.exp-trigger').forEach(btn => {
-                btn.addEventListener('click', e => {
-                    e.stopPropagation();
-                    openModal(btn.dataset.expand);
-                });
-            });
-
-            /* ── Close via button / overlay / Esc ───────────────────── */
-            closeBtn.addEventListener('click', closeModal);
-            overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
-            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-            /* ── Double-click portlet title to expand ────────────────── */
-            document.querySelectorAll('.exp-trigger').forEach(btn => {
-                const portlet = btn.closest('.portlet');
-                if (portlet) {
-                    portlet.querySelector('.portlet-hd-title')?.addEventListener('dblclick', () => {
-                        openModal(btn.dataset.expand);
-                    });
-                }
-            });
-
-        })();
-    </script>
 
 @endpush
 
@@ -1293,6 +803,36 @@
         </div>
     </div>
 
+    @php
+        /* Pre-compute flat arrays for the expand modal JS — simple @json() only */
+        $expCustomers = collect($topCustomers)->map(fn($c) => [
+            'name'  => $c->name,
+            'total' => (float) $c->total,
+        ])->values()->toArray();
+
+        $expSalesmen = collect($topCustomers)->map(fn($c) => [
+            'name'  => $c->name,
+            'total' => (float) $c->total,
+        ])->values()->toArray();
+
+        $expCategories = collect($salesByCategory)->map(fn($c) => [
+            'name'  => $c->category ?: 'Other',
+            'total' => (float) $c->total,
+        ])->values()->toArray();
+
+        $expTopSuppliers = collect($topSuppliers)->map(fn($s) => [
+            'name'  => $s->supp_name,
+            'total' => (float) $s->total,
+        ])->values()->toArray();
+
+        $expTopItems = collect($topItems)->map(fn($i) => [
+            'name'  => $i->description ?: $i->stock_id,
+            'total' => (float) $i->total,
+            'qty'   => (float) $i->qty,
+        ])->values()->toArray();
+    @endphp
+
+
     {{-- ═══════════════════════════════════════ EXPAND MODALS ════════════════ --}}
     <div class="exp-overlay" id="expOverlay" role="dialog" aria-modal="true">
         <div class="exp-modal" id="expModal">
@@ -1331,6 +871,230 @@
 
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const overlay = document.getElementById('expOverlay');
+            const modalBody = document.getElementById('expModalBody');
+            const modalTitle = document.getElementById('expModalTitle');
+            const closeBtn = document.getElementById('expClose');
+            const tabs = document.querySelectorAll('.exp-tab');
+
+            /* Sample data from blade */
+            const modalData = {
+                trend: {
+                    title: 'Monthly Sales Trend',
+                    content: `
+                <div class="exp-stats">
+                    <div class="exp-stat">
+                        <div class="exp-stat-val">{{ number_format($monthlySales,0) }}</div>
+                        <div class="exp-stat-lbl">Monthly Sales</div>
+                    </div>
+
+                    <div class="exp-stat">
+                        <div class="exp-stat-val">{{ number_format($monthlyPurchases,0) }}</div>
+                        <div class="exp-stat-lbl">Purchases</div>
+                    </div>
+
+                    <div class="exp-stat">
+                        <div class="exp-stat-val">{{ $gpMarginPct }}%</div>
+                        <div class="exp-stat-lbl">GP Margin</div>
+                    </div>
+
+                    <div class="exp-stat">
+                        <div class="exp-stat-val">{{ $overdueCount }}</div>
+                        <div class="exp-stat-lbl">Overdue</div>
+                    </div>
+                </div>
+
+                <div class="exp-chart-wrap">
+                    <canvas id="expandedTrendChart" height="120"></canvas>
+                </div>
+            `
+                },
+
+                customers: {
+                    title: 'Top Customers',
+                    content: `
+                <table class="exp-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Total Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($topCustomers as $i => $c)
+                    <tr>
+                        <td>{{ $i+1 }}</td>
+                            <td>{{ $c->name }}</td>
+                            <td>{{ number_format($c->total,0) }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            `
+                },
+
+                salesmen: {
+                    title: 'Top Salesmen',
+                    content: `
+                <table class="exp-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($topCustomers as $i => $c)
+                    <tr>
+                        <td>{{ $i+1 }}</td>
+                            <td>{{ $c->name }}</td>
+                            <td>{{ number_format($c->total,0) }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            `
+                },
+
+                comparative: {
+                    title: 'Comparative Sales',
+                    content: `
+                <div class="exp-chart-wrap">
+                    <canvas id="expandedCompareChart" height="120"></canvas>
+                </div>
+            `
+                },
+
+                categories: {
+                    title: 'Sales By Category',
+                    content: `
+                <table class="exp-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Category</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($salesByCategory as $i => $cat)
+                    <tr>
+                        <td>{{ $i+1 }}</td>
+                            <td>{{ $cat->category ?: 'Other' }}</td>
+                            <td>{{ number_format($cat->total,0) }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            `
+                }
+            };
+
+            /* Open modal */
+            document.querySelectorAll('.exp-trigger').forEach(btn => {
+                btn.addEventListener('click', function () {
+
+                    const type = this.dataset.expand;
+
+                    if (!modalData[type]) return;
+
+                    modalTitle.innerText = modalData[type].title;
+                    modalBody.innerHTML = modalData[type].content;
+
+                    overlay.classList.add('open');
+
+                    /* Draw expanded charts after modal render */
+                    setTimeout(() => {
+
+                        if (type === 'trend') {
+                            const ctx = document
+                                .getElementById('expandedTrendChart')
+                                ?.getContext('2d');
+
+                            if (ctx) {
+                                new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: @json($chartLabels),
+                                        datasets: [
+                                            {
+                                                label: 'Sales',
+                                                data: @json($chartSales)
+                                            },
+                                            {
+                                                label: 'Purchases',
+                                                data: @json($chartPurchases)
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        responsive: true
+                                    }
+                                });
+                            }
+                        }
+
+                        if (type === 'comparative') {
+                            const ctx = document
+                                .getElementById('expandedCompareChart')
+                                ?.getContext('2d');
+
+                            if (ctx) {
+                                new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        labels: @json($chartLabels),
+                                        datasets: [
+                                            {
+                                                label: 'This Year',
+                                                data: @json($chartSales)
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        responsive: true
+                                    }
+                                });
+                            }
+                        }
+
+                    }, 100);
+                });
+            });
+
+            /* Close */
+            closeBtn.addEventListener('click', () => {
+                overlay.classList.remove('open');
+            });
+
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) {
+                    overlay.classList.remove('open');
+                }
+            });
+
+            /* ESC close */
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    overlay.classList.remove('open');
+                }
+            });
+
+            /* Tabs */
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+        });
+    </script>
     <script>
         (function(){
             Chart.defaults.font.family = "'Nunito Sans', sans-serif";
