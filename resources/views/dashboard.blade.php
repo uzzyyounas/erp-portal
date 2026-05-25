@@ -410,14 +410,14 @@
 @section('content')
 
     {{-- Page title --}}
-    <div class="dash-page-title anim d1">
-        <h2>Home</h2>
-        <div class="dash-page-title-right">
-            Viewing: <a href="#">Portlet date settings ▾</a>
-            &nbsp;|&nbsp; <a href="#">Personalise ▾</a>
-            &nbsp;|&nbsp; <a href="#">Layout ▾</a>
-        </div>
-    </div>
+{{--    <div class="dash-page-title anim d1">--}}
+{{--        <h2>Home</h2>--}}
+{{--        <div class="dash-page-title-right">--}}
+{{--            Viewing: <a href="#">Portlet date settings ▾</a>--}}
+{{--            &nbsp;|&nbsp; <a href="#">Personalise ▾</a>--}}
+{{--            &nbsp;|&nbsp; <a href="#">Layout ▾</a>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 
     {{-- Three-column dashboard --}}
     <div class="dash-3col">
@@ -541,48 +541,48 @@
             </div>
 
             {{-- Navigation Shortcuts --}}
-            <div class="portlet anim d3">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-grid-3x3-gap-fill"></i> Navigation Shortcut Group</div>
-                    <div class="portlet-hd-actions">
-                        <div class="phd-btn"><i class="bi bi-pencil"></i></div>
-                        <div class="phd-btn"><i class="bi bi-x"></i></div>
-                    </div>
-                </div>
-                <div class="portlet-bd">
-                    @forelse($sidebarModules as $module)
-                        <div class="shortcut-section mb-3">
-                            <div class="shortcut-section-title">
-                                <i class="bi bi-list-ul" style="color:var(--brand);"></i>
-                                <i class="bi {{ $module->icon }}" style="color:{{ $module->color }};"></i>
-                                {{ $module->name }}
-                            </div>
-                            @php
-                                $items = $module->activeMenuItems->where('type','!=','divider')->chunk(
-                                    max(1, (int)ceil($module->activeMenuItems->where('type','!=','divider')->count() / 4))
-                                );
-                            @endphp
-                            <div class="shortcut-cols">
-                                @foreach($items as $chunk)
-                                    <div>
-                                        <div class="shortcut-col-hd">
-                                            @if($loop->first) Reports @elseif($loop->index===1) Forms @else Links @endif
-                                        </div>
-                                        @foreach($chunk as $item)
-                                            <a href="{{ $item->url }}" class="shortcut-link">
-                                                <i class="bi {{ $item->icon ?: 'bi-file-text' }}"></i>
-                                                {{ $item->name }}
-                                            </a>
-                                        @endforeach
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @empty
-                        <div style="text-align:center;color:var(--text-sm);font-size:.78rem;padding:14px;">No modules assigned.</div>
-                    @endforelse
-                </div>
-            </div>
+{{--            <div class="portlet anim d3">--}}
+{{--                <div class="portlet-hd">--}}
+{{--                    <div class="portlet-hd-title"><i class="bi bi-grid-3x3-gap-fill"></i> Navigation Shortcut Group</div>--}}
+{{--                    <div class="portlet-hd-actions">--}}
+{{--                        <div class="phd-btn"><i class="bi bi-pencil"></i></div>--}}
+{{--                        <div class="phd-btn"><i class="bi bi-x"></i></div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                <div class="portlet-bd">--}}
+{{--                    @forelse($sidebarModules as $module)--}}
+{{--                        <div class="shortcut-section mb-3">--}}
+{{--                            <div class="shortcut-section-title">--}}
+{{--                                <i class="bi bi-list-ul" style="color:var(--brand);"></i>--}}
+{{--                                <i class="bi {{ $module->icon }}" style="color:{{ $module->color }};"></i>--}}
+{{--                                {{ $module->name }}--}}
+{{--                            </div>--}}
+{{--                            @php--}}
+{{--                                $items = $module->activeMenuItems->where('type','!=','divider')->chunk(--}}
+{{--                                    max(1, (int)ceil($module->activeMenuItems->where('type','!=','divider')->count() / 4))--}}
+{{--                                );--}}
+{{--                            @endphp--}}
+{{--                            <div class="shortcut-cols">--}}
+{{--                                @foreach($items as $chunk)--}}
+{{--                                    <div>--}}
+{{--                                        <div class="shortcut-col-hd">--}}
+{{--                                            @if($loop->first) Reports @elseif($loop->index===1) Forms @else Links @endif--}}
+{{--                                        </div>--}}
+{{--                                        @foreach($chunk as $item)--}}
+{{--                                            <a href="{{ $item->url }}" class="shortcut-link">--}}
+{{--                                                <i class="bi {{ $item->icon ?: 'bi-file-text' }}"></i>--}}
+{{--                                                {{ $item->name }}--}}
+{{--                                            </a>--}}
+{{--                                        @endforeach--}}
+{{--                                    </div>--}}
+{{--                                @endforeach--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    @empty--}}
+{{--                        <div style="text-align:center;color:var(--text-sm);font-size:.78rem;padding:14px;">No modules assigned.</div>--}}
+{{--                    @endforelse--}}
+{{--                </div>--}}
+{{--            </div>--}}
 
             {{-- Key Performance Indicators --}}
             <div class="portlet anim d4">
