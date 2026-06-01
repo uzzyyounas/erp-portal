@@ -104,6 +104,55 @@ class DashboardController extends Controller
               AND (ABS(ov_amount+ov_gst+ov_freight+ov_freight_tax+ov_discount)-alloc)>0.001
         ")->total;
 
+//        $currentMonth = Carbon::now()->month;
+//        $months = collect();
+//
+//        for ($m = 1; $m <= $currentMonth; $m++) {
+//            $months->push(Carbon::create(Carbon::now()->year, $m, 1)->format('Y-m'));
+//        }
+
+        $currentYearSales = DB::select("
+    SELECT DATE_FORMAT(tran_date,'%Y-%m') AS month,
+           SUM(ABS(ov_amount+ov_gst+ov_freight+ov_freight_tax+ov_discount)) AS total
+    FROM {$p}debtor_trans
+    WHERE type=".self::ST_SALESINVOICE."
+      AND YEAR(tran_date)=YEAR(CURDATE())
+    GROUP BY DATE_FORMAT(tran_date,'%Y-%m')
+    ORDER BY month
+");
+
+        $previousYearSales = DB::select("
+    SELECT MONTH(tran_date) AS month_no,
+           SUM(ABS(ov_amount+ov_gst+ov_freight+ov_freight_tax+ov_discount)) AS total
+    FROM {$p}debtor_trans
+    WHERE type=".self::ST_SALESINVOICE."
+      AND YEAR(tran_date)=YEAR(CURDATE()) - 1
+      AND MONTH(tran_date) <= MONTH(CURDATE())
+    GROUP BY MONTH(tran_date)
+    ORDER BY month_no
+");
+
+        $currentMap = collect($currentYearSales)->pluck('total', 'month');
+
+        $previousMap = collect($previousYearSales)->pluck('total', 'month_no');
+
+        $chartLabels = [];
+        $chartThisYear = [];
+        $chartLastYear = [];
+
+        for ($m = 1; $m <= Carbon::now()->month; $m++) {
+
+            $monthKey = Carbon::now()->year . '-' . str_pad($m, 2, '0', STR_PAD_LEFT);
+
+            $chartLabels[] = Carbon::create(null, $m, 1)->format('M');
+
+            $chartThisYear[] = round((float)($currentMap[$monthKey] ?? 0), 2);
+
+            $chartLastYear[] = round((float)($previousMap[$m] ?? 0), 2);
+        }
+
+//        dd($currentYearSales, $previousYearSales);
+
         // 7-month trend
         $trendStart = Carbon::now()->subMonths(6)->startOfMonth()->toDateString();
 
@@ -252,7 +301,9 @@ class DashboardController extends Controller
             'receivablesAging',
             'topCustomers',       'topItems',        'topSuppliers',
             'sidebarModules',     'totalItems',
-            'searchIndex'
+            'searchIndex','chartLabels',
+            'chartThisYear',
+            'chartLastYear'
         ));
     }
 }

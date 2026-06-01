@@ -409,14 +409,14 @@
     @section('content')
 
         {{-- Page title --}}
-{{--        <div class="dash-page-title anim d1">--}}
-{{--            <h2>Home</h2>--}}
-{{--            <div class="dash-page-title-right">--}}
-{{--                Viewing: <a href="#">Portlet date settings ▾</a>--}}
-{{--                &nbsp;|&nbsp; <a href="#">Personalise ▾</a>--}}
-{{--                &nbsp;|&nbsp; <a href="#">Layout ▾</a>--}}
-{{--            </div>--}}
-{{--        </div>--}}
+        {{--        <div class="dash-page-title anim d1">--}}
+        {{--            <h2>Home</h2>--}}
+        {{--            <div class="dash-page-title-right">--}}
+        {{--                Viewing: <a href="#">Portlet date settings ▾</a>--}}
+        {{--                &nbsp;|&nbsp; <a href="#">Personalise ▾</a>--}}
+        {{--                &nbsp;|&nbsp; <a href="#">Layout ▾</a>--}}
+        {{--            </div>--}}
+        {{--        </div>--}}
 
         {{-- Three-column dashboard --}}
         <div class="dash-3col">
@@ -540,48 +540,48 @@
                 </div>
 
                 {{-- Navigation Shortcuts --}}
-{{--                <div class="portlet anim d3">--}}
-{{--                    <div class="portlet-hd">--}}
-{{--                        <div class="portlet-hd-title"><i class="bi bi-grid-3x3-gap-fill"></i> Navigation Shortcut Group</div>--}}
-{{--                        <div class="portlet-hd-actions">--}}
-{{--                            <div class="phd-btn"><i class="bi bi-pencil"></i></div>--}}
-{{--                            <div class="phd-btn"><i class="bi bi-x"></i></div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="portlet-bd">--}}
-{{--                        @forelse($sidebarModules as $module)--}}
-{{--                            <div class="shortcut-section mb-3">--}}
-{{--                                <div class="shortcut-section-title">--}}
-{{--                                    <i class="bi bi-list-ul" style="color:var(--brand);"></i>--}}
-{{--                                    <i class="bi {{ $module->icon }}" style="color:{{ $module->color }};"></i>--}}
-{{--                                    {{ $module->name }}--}}
-{{--                                </div>--}}
-{{--                                @php--}}
-{{--                                    $items = $module->activeMenuItems->where('type','!=','divider')->chunk(--}}
-{{--                                        max(1, (int)ceil($module->activeMenuItems->where('type','!=','divider')->count() / 4))--}}
-{{--                                    );--}}
-{{--                                @endphp--}}
-{{--                                <div class="shortcut-cols">--}}
-{{--                                    @foreach($items as $chunk)--}}
-{{--                                        <div>--}}
-{{--                                            <div class="shortcut-col-hd">--}}
-{{--                                                @if($loop->first) Reports @elseif($loop->index===1) Forms @else Links @endif--}}
-{{--                                            </div>--}}
-{{--                                            @foreach($chunk as $item)--}}
-{{--                                                <a href="{{ $item->url }}" class="shortcut-link">--}}
-{{--                                                    <i class="bi {{ $item->icon ?: 'bi-file-text' }}"></i>--}}
-{{--                                                    {{ $item->name }}--}}
-{{--                                                </a>--}}
-{{--                                            @endforeach--}}
-{{--                                        </div>--}}
-{{--                                    @endforeach--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        @empty--}}
-{{--                            <div style="text-align:center;color:var(--text-sm);font-size:.78rem;padding:14px;">No modules assigned.</div>--}}
-{{--                        @endforelse--}}
-{{--                    </div>--}}
-{{--                </div>--}}
+                {{--                <div class="portlet anim d3">--}}
+                {{--                    <div class="portlet-hd">--}}
+                {{--                        <div class="portlet-hd-title"><i class="bi bi-grid-3x3-gap-fill"></i> Navigation Shortcut Group</div>--}}
+                {{--                        <div class="portlet-hd-actions">--}}
+                {{--                            <div class="phd-btn"><i class="bi bi-pencil"></i></div>--}}
+                {{--                            <div class="phd-btn"><i class="bi bi-x"></i></div>--}}
+                {{--                        </div>--}}
+                {{--                    </div>--}}
+                {{--                    <div class="portlet-bd">--}}
+                {{--                        @forelse($sidebarModules as $module)--}}
+                {{--                            <div class="shortcut-section mb-3">--}}
+                {{--                                <div class="shortcut-section-title">--}}
+                {{--                                    <i class="bi bi-list-ul" style="color:var(--brand);"></i>--}}
+                {{--                                    <i class="bi {{ $module->icon }}" style="color:{{ $module->color }};"></i>--}}
+                {{--                                    {{ $module->name }}--}}
+                {{--                                </div>--}}
+                {{--                                @php--}}
+                {{--                                    $items = $module->activeMenuItems->where('type','!=','divider')->chunk(--}}
+                {{--                                        max(1, (int)ceil($module->activeMenuItems->where('type','!=','divider')->count() / 4))--}}
+                {{--                                    );--}}
+                {{--                                @endphp--}}
+                {{--                                <div class="shortcut-cols">--}}
+                {{--                                    @foreach($items as $chunk)--}}
+                {{--                                        <div>--}}
+                {{--                                            <div class="shortcut-col-hd">--}}
+                {{--                                                @if($loop->first) Reports @elseif($loop->index===1) Forms @else Links @endif--}}
+                {{--                                            </div>--}}
+                {{--                                            @foreach($chunk as $item)--}}
+                {{--                                                <a href="{{ $item->url }}" class="shortcut-link">--}}
+                {{--                                                    <i class="bi {{ $item->icon ?: 'bi-file-text' }}"></i>--}}
+                {{--                                                    {{ $item->name }}--}}
+                {{--                                                </a>--}}
+                {{--                                            @endforeach--}}
+                {{--                                        </div>--}}
+                {{--                                    @endforeach--}}
+                {{--                                </div>--}}
+                {{--                            </div>--}}
+                {{--                        @empty--}}
+                {{--                            <div style="text-align:center;color:var(--text-sm);font-size:.78rem;padding:14px;">No modules assigned.</div>--}}
+                {{--                        @endforelse--}}
+                {{--                    </div>--}}
+                {{--                </div>--}}
 
                 {{-- Key Performance Indicators --}}
                 <div class="portlet anim d4">
@@ -924,22 +924,67 @@
                 });
 
                 /* ── 2. Comparative mini chart ──────────────────────────── */
-                new Chart(document.getElementById('compareMini'),{
-                    type:'line',
-                    data:{ labels, datasets:[
-                            {label:'This Year', data:sales, borderColor:'#1565c0', backgroundColor:'rgba(21,101,192,.1)',
-                                pointRadius:2, borderWidth:1.8, tension:.4, fill:true},
-                            {label:'Last Year', data:sales.map(v=>v*0.78+(Math.random()-.5)*v*.1),
-                                borderColor:'#e8a020', backgroundColor:'transparent',
-                                pointRadius:2, borderWidth:1.8, tension:.4, borderDash:[4,3]},
-                        ]},
-                    options:{
-                        responsive:true, maintainAspectRatio:true,
-                        plugins:{legend:{display:false}, tooltip:tip},
-                        scales:{
-                            x:{grid:{display:false},border:{display:false},ticks:{font:{size:8},color:'#94a3b8'}},
-                            y:{grid:{color:'#edf1f9'},border:{display:false},
-                                ticks:{font:{family:"'JetBrains Mono'",size:8},color:'#94a3b8',callback:fmtC,maxTicksLimit:4}}
+
+                const thisYearSales = @json($chartThisYear);
+                const lastYearSales = @json($chartLastYear);
+                const compareLabels = @json($chartLabels);
+
+                new Chart(document.getElementById('compareMini'), {
+                    type: 'line',
+                    data: {
+                        labels: compareLabels,
+                        datasets: [
+                            {
+                                label: 'This Year',
+                                data: thisYearSales,
+                                borderColor: '#1565c0',
+                                backgroundColor: 'rgba(21,101,192,.1)',
+                                pointRadius: 2,
+                                borderWidth: 2,
+                                tension: .4,
+                                fill: true
+                            },
+                            {
+                                label: 'Last Year',
+                                data: lastYearSales,
+                                borderColor: '#e8a020',
+                                backgroundColor: 'transparent',
+                                pointRadius: 2,
+                                borderWidth: 2,
+                                tension: .4,
+                                borderDash: [5,3]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: tip
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: {
+                                    font: { size: 8 },
+                                    color: '#94a3b8'
+                                }
+                            },
+                            y: {
+                                grid: { color: '#edf1f9' },
+                                border: { display: false },
+                                ticks: {
+                                    font: {
+                                        family: "'JetBrains Mono'",
+                                        size: 8
+                                    },
+                                    color: '#94a3b8',
+                                    callback: fmtC,
+                                    maxTicksLimit: 4
+                                }
+                            }
                         }
                     }
                 });
@@ -1025,482 +1070,482 @@
             (function () {
                 'use strict';
 
-    var DATA = {
-        customers:  @json($expCustomers),
-        salesmen:   @json($expSalesmen),
-        categories: @json($expCategories),
-        suppliers:  @json($expTopSuppliers),
-        items:      @json($expTopItems),
-        trend: {
-            labels:    @json($chartLabels),
-            sales:     @json($chartSales),
-            purchases: @json($chartPurchases),
-            gp:        @json($chartGP),
-        }
-    };
+                var DATA = {
+                    customers:  @json($expCustomers),
+                    salesmen:   @json($expSalesmen),
+                    categories: @json($expCategories),
+                    suppliers:  @json($expTopSuppliers),
+                    items:      @json($expTopItems),
+                    trend: {
+                        labels:    @json($chartLabels),
+                        sales:     @json($chartSales),
+                        purchases: @json($chartPurchases),
+                        gp:        @json($chartGP),
+                    }
+                };
 
-    /* ── 2. Palette ─────────────────────────────────────── */
-    var PAL = ['#1565c0','#2e7d32','#e65100','#6a1b9a','#c62828',
-               '#00695c','#f57f17','#4527a0','#ad1457','#00838f'];
+                /* ── 2. Palette ─────────────────────────────────────── */
+                var PAL = ['#1565c0','#2e7d32','#e65100','#6a1b9a','#c62828',
+                    '#00695c','#f57f17','#4527a0','#ad1457','#00838f'];
 
-    /* ── 3. Format helpers ──────────────────────────────── */
-    function fmtN(v) { return new Intl.NumberFormat().format(Math.round(v || 0)); }
-    function fmtK(v) {
-        v = v || 0;
-        if (v >= 1e6) return (v/1e6).toFixed(2)+'M';
-        if (v >= 1e3) return (v/1e3).toFixed(1)+'K';
-        return Math.round(v).toString();
-    }
-    function fmtC(v) {
-        return new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(v||0);
-    }
-    function pct(part, whole) {
-        return whole > 0 ? ((part/whole)*100).toFixed(1)+'%' : '0%';
-    }
-    function rankCls(i) { return i===0?'g1':i===1?'g2':i===2?'g3':''; }
-
-    /* ── 4. DOM refs ────────────────────────────────────── */
-    var overlay  = document.getElementById('expOverlay');
-    var modalEl  = document.getElementById('expModal');
-    var bodyEl   = document.getElementById('expModalBody');
-    var titleEl  = document.getElementById('expModalTitle');
-    var subEl    = document.getElementById('expModalSub');
-    var iconEl   = document.getElementById('expModalIcon').querySelector('i');
-    var tabsEl   = document.getElementById('expTabs');
-    var closeBtn = document.getElementById('expClose');
-
-    if (!overlay || !closeBtn) {
-        console.warn('Expand modal DOM not found');
-        return;
-    }
-
-    var activeChart  = null;
-    var activeTab    = 'chart';
-    var currentKey   = null;
-
-    /* ── 5. Shared tooltip ──────────────────────────────── */
-    function tipCfg() {
-        return {
-            backgroundColor:'#1a2332', padding:10, cornerRadius:7,
-            titleFont:{size:12,weight:'700'},
-            bodyFont:{family:"'JetBrains Mono',monospace",size:11},
-            callbacks:{ label: function(c){ return '  '+c.dataset.label+': '+fmtN(c.raw); } }
-        };
-    }
-
-    /* ── 6. Shared scale ────────────────────────────────── */
-    function scales() {
-        return {
-            x:{ grid:{display:false}, border:{display:false},
-                ticks:{font:{size:11,weight:'600'},color:'#94a3b8',maxRotation:30} },
-            y:{ grid:{color:'#edf1f9'}, border:{display:false},
-                ticks:{font:{family:"'JetBrains Mono',monospace",size:10},
-                       color:'#94a3b8', callback:fmtC, maxTicksLimit:6} }
-        };
-    }
-
-    /* ── 7. Build stats pills HTML ──────────────────────── */
-    function statsHtml(stats) {
-        var html = '<div class="exp-stats">';
-        stats.forEach(function(s) {
-            html += '<div class="exp-stat" style="border-left-color:'+s.color+';">'
-                  + '<div class="exp-stat-val" style="color:'+s.color+';">'+s.val+'</div>'
-                  + '<div class="exp-stat-lbl">'+s.label+'</div>'
-                  + '</div>';
-        });
-        return html + '</div>';
-    }
-
-    /* ── 8. Build table HTML ────────────────────────────── */
-    function tableHtml(headers, rows) {
-        var ths = headers.map(function(h){ return '<th>'+h+'</th>'; }).join('');
-        var trs = rows.map(function(cols){
-            return '<tr>'+cols.map(function(c){ return '<td>'+c+'</td>'; }).join('')+'</tr>';
-        }).join('');
-        return '<div style="overflow-x:auto;">'
-             + '<table class="exp-table"><thead><tr>'+ths+'</tr></thead>'
-             + '<tbody>'+trs+'</tbody></table></div>';
-    }
-
-    /* ── 9. Rank-bar cell ────────────────────────────────── */
-    function barCell(val, max, color) {
-        var w = max > 0 ? ((val/max)*100).toFixed(1) : 0;
-        return '<div class="bar-bg"><div class="bar-fill" '
-             + 'style="width:'+w+'%;background:'+color+';"></div></div>';
-    }
-
-    /* ── 10. Configs ─────────────────────────────────────── */
-    function getConfig(key) {
-
-        /* ---- helpers shared by ranked-list configs -------- */
-        function rankedStats(rows, entityLabel) {
-            var total = rows.reduce(function(a,r){ return a+r.total; }, 0);
-            var top   = rows[0] || {};
-            return [
-                {label:'Total (Top '+rows.length+')', val:fmtK(total),            color:'#1565c0'},
-                {label:'#1 '+entityLabel,             val:(top.name||'—').split(' ')[0], color:'#2e7d32'},
-                {label:'#1 Value',                    val:fmtK(top.total||0),      color:'#e65100'},
-                {label:'Avg',                         val:fmtK(rows.length ? total/rows.length : 0), color:'#6a1b9a'},
-            ];
-        }
-
-        function rankedBarChart(canvas, rows, label) {
-            return new Chart(canvas, {
-                type:'bar',
-                data:{
-                    labels: rows.map(function(r){ return r.name; }),
-                    datasets:[{
-                        label: label,
-                        data:  rows.map(function(r){ return r.total; }),
-                        backgroundColor: rows.map(function(_,i){ return PAL[i]+'cc'; }),
-                        borderColor:     rows.map(function(_,i){ return PAL[i]; }),
-                        borderWidth:1, borderRadius:6, borderSkipped:false,
-                    }]
-                },
-                options:{
-                    responsive:true, maintainAspectRatio:true,
-                    interaction:{mode:'index',intersect:false},
-                    plugins:{legend:{display:false}, tooltip:tipCfg()},
-                    scales:scales()
+                /* ── 3. Format helpers ──────────────────────────────── */
+                function fmtN(v) { return new Intl.NumberFormat().format(Math.round(v || 0)); }
+                function fmtK(v) {
+                    v = v || 0;
+                    if (v >= 1e6) return (v/1e6).toFixed(2)+'M';
+                    if (v >= 1e3) return (v/1e3).toFixed(1)+'K';
+                    return Math.round(v).toString();
                 }
-            });
-        }
+                function fmtC(v) {
+                    return new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(v||0);
+                }
+                function pct(part, whole) {
+                    return whole > 0 ? ((part/whole)*100).toFixed(1)+'%' : '0%';
+                }
+                function rankCls(i) { return i===0?'g1':i===1?'g2':i===2?'g3':''; }
 
-        function rankedTable(rows, colLabel) {
-            var max = Math.max.apply(null, rows.map(function(r){ return r.total; }).concat([1]));
-            var tot = rows.reduce(function(a,r){ return a+r.total; }, 0) || 1;
-            return tableHtml(
-                ['#', colLabel, 'Total', 'Share', 'Bar'],
-                rows.map(function(r, i){
-                    return [
-                        '<span class="rank-badge '+rankCls(i)+'">'+(i+1)+'</span>',
-                        '<strong>'+r.name+'</strong>',
-                        '<span class="val-mono">'+fmtN(r.total)+'</span>',
-                        '<span class="val-mono">'+pct(r.total,tot)+'</span>',
-                        barCell(r.total, max, PAL[i])
-                    ];
-                })
-            );
-        }
+                /* ── 4. DOM refs ────────────────────────────────────── */
+                var overlay  = document.getElementById('expOverlay');
+                var modalEl  = document.getElementById('expModal');
+                var bodyEl   = document.getElementById('expModalBody');
+                var titleEl  = document.getElementById('expModalTitle');
+                var subEl    = document.getElementById('expModalSub');
+                var iconEl   = document.getElementById('expModalIcon').querySelector('i');
+                var tabsEl   = document.getElementById('expTabs');
+                var closeBtn = document.getElementById('expClose');
 
-        var CONFIGS = {
+                if (!overlay || !closeBtn) {
+                    console.warn('Expand modal DOM not found');
+                    return;
+                }
 
-            /* ── Customers ──────────────────────────── */
-            customers:{
-                title:'Top Customers by Sales', sub:'Year-to-date by gross invoice value',
-                icon:'bi-people-fill', tabs:['chart','table'],
-                stats:   function(){ return rankedStats(DATA.customers, 'Customer'); },
-                chart:   function(c){ return rankedBarChart(c, DATA.customers, 'Sales'); },
-                table:   function(){ return rankedTable(DATA.customers, 'Customer Name'); }
-            },
+                var activeChart  = null;
+                var activeTab    = 'chart';
+                var currentKey   = null;
 
-            /* ── Salesmen ───────────────────────────── */
-            salesmen:{
-                title:'Top Salesmen by Sales', sub:'Year-to-date by gross invoice value',
-                icon:'bi-person-badge-fill', tabs:['chart','table'],
-                stats:   function(){ return rankedStats(DATA.salesmen, 'Salesman'); },
-                chart:   function(c){ return rankedBarChart(c, DATA.salesmen, 'Sales'); },
-                table:   function(){ return rankedTable(DATA.salesmen, 'Salesman Name'); }
-            },
+                /* ── 5. Shared tooltip ──────────────────────────────── */
+                function tipCfg() {
+                    return {
+                        backgroundColor:'#1a2332', padding:10, cornerRadius:7,
+                        titleFont:{size:12,weight:'700'},
+                        bodyFont:{family:"'JetBrains Mono',monospace",size:11},
+                        callbacks:{ label: function(c){ return '  '+c.dataset.label+': '+fmtN(c.raw); } }
+                    };
+                }
 
-            /* ── Categories ─────────────────────────── */
-            categories:{
-                title:'Sales by Category', sub:'Year-to-date breakdown by inventory category',
-                icon:'bi-pie-chart-fill', tabs:['chart','table'],
-                stats: function(){
-                    var d = DATA.categories;
-                    var total = d.reduce(function(a,r){ return a+r.total; },0);
-                    var top   = d[0]||{};
-                    return [
-                        {label:'Total Sales',   val:fmtK(total),         color:'#1565c0'},
-                        {label:'Top Category',  val:top.name||'—',       color:'#2e7d32'},
-                        {label:'Top Value',     val:fmtK(top.total||0),  color:'#e65100'},
-                        {label:'Categories',    val:d.length.toString(), color:'#6a1b9a'},
-                    ];
-                },
-                chart: function(canvas){
-                    var d = DATA.categories;
-                    return new Chart(canvas, {
-                        type:'doughnut',
-                        data:{
-                            labels: d.map(function(r){ return r.name; }),
-                            datasets:[{
-                                data: d.map(function(r){ return r.total; }),
-                                backgroundColor: PAL.slice(0, d.length),
-                                borderColor:'#fff', borderWidth:3, hoverOffset:10,
-                            }]
-                        },
-                        options:{
-                            responsive:true, maintainAspectRatio:true, cutout:'55%',
-                            plugins:{
-                                legend:{position:'right', labels:{font:{size:11},padding:14,boxWidth:14,boxHeight:14}},
-                                tooltip:{backgroundColor:'#1a2332',padding:10,cornerRadius:7,
-                                    callbacks:{label:function(c){ return '  '+c.label+': '+fmtN(c.raw); }}}
+                /* ── 6. Shared scale ────────────────────────────────── */
+                function scales() {
+                    return {
+                        x:{ grid:{display:false}, border:{display:false},
+                            ticks:{font:{size:11,weight:'600'},color:'#94a3b8',maxRotation:30} },
+                        y:{ grid:{color:'#edf1f9'}, border:{display:false},
+                            ticks:{font:{family:"'JetBrains Mono',monospace",size:10},
+                                color:'#94a3b8', callback:fmtC, maxTicksLimit:6} }
+                    };
+                }
+
+                /* ── 7. Build stats pills HTML ──────────────────────── */
+                function statsHtml(stats) {
+                    var html = '<div class="exp-stats">';
+                    stats.forEach(function(s) {
+                        html += '<div class="exp-stat" style="border-left-color:'+s.color+';">'
+                            + '<div class="exp-stat-val" style="color:'+s.color+';">'+s.val+'</div>'
+                            + '<div class="exp-stat-lbl">'+s.label+'</div>'
+                            + '</div>';
+                    });
+                    return html + '</div>';
+                }
+
+                /* ── 8. Build table HTML ────────────────────────────── */
+                function tableHtml(headers, rows) {
+                    var ths = headers.map(function(h){ return '<th>'+h+'</th>'; }).join('');
+                    var trs = rows.map(function(cols){
+                        return '<tr>'+cols.map(function(c){ return '<td>'+c+'</td>'; }).join('')+'</tr>';
+                    }).join('');
+                    return '<div style="overflow-x:auto;">'
+                        + '<table class="exp-table"><thead><tr>'+ths+'</tr></thead>'
+                        + '<tbody>'+trs+'</tbody></table></div>';
+                }
+
+                /* ── 9. Rank-bar cell ────────────────────────────────── */
+                function barCell(val, max, color) {
+                    var w = max > 0 ? ((val/max)*100).toFixed(1) : 0;
+                    return '<div class="bar-bg"><div class="bar-fill" '
+                        + 'style="width:'+w+'%;background:'+color+';"></div></div>';
+                }
+
+                /* ── 10. Configs ─────────────────────────────────────── */
+                function getConfig(key) {
+
+                    /* ---- helpers shared by ranked-list configs -------- */
+                    function rankedStats(rows, entityLabel) {
+                        var total = rows.reduce(function(a,r){ return a+r.total; }, 0);
+                        var top   = rows[0] || {};
+                        return [
+                            {label:'Total (Top '+rows.length+')', val:fmtK(total),            color:'#1565c0'},
+                            {label:'#1 '+entityLabel,             val:(top.name||'—').split(' ')[0], color:'#2e7d32'},
+                            {label:'#1 Value',                    val:fmtK(top.total||0),      color:'#e65100'},
+                            {label:'Avg',                         val:fmtK(rows.length ? total/rows.length : 0), color:'#6a1b9a'},
+                        ];
+                    }
+
+                    function rankedBarChart(canvas, rows, label) {
+                        return new Chart(canvas, {
+                            type:'bar',
+                            data:{
+                                labels: rows.map(function(r){ return r.name; }),
+                                datasets:[{
+                                    label: label,
+                                    data:  rows.map(function(r){ return r.total; }),
+                                    backgroundColor: rows.map(function(_,i){ return PAL[i]+'cc'; }),
+                                    borderColor:     rows.map(function(_,i){ return PAL[i]; }),
+                                    borderWidth:1, borderRadius:6, borderSkipped:false,
+                                }]
+                            },
+                            options:{
+                                responsive:true, maintainAspectRatio:true,
+                                interaction:{mode:'index',intersect:false},
+                                plugins:{legend:{display:false}, tooltip:tipCfg()},
+                                scales:scales()
                             }
-                        }
-                    });
-                },
-                table: function(){
-                    var d = DATA.categories;
-                    var max = Math.max.apply(null, d.map(function(r){ return r.total; }).concat([1]));
-                    var tot = d.reduce(function(a,r){ return a+r.total; },0)||1;
-                    return tableHtml(
-                        ['#','Category','Net Sales','Share','Bar'],
-                        d.map(function(r,i){
-                            return [
-                                '<span class="rank-badge '+rankCls(i)+'">'+(i+1)+'</span>',
-                                '<span style="display:flex;align-items:center;gap:7px;">'
-                                  +'<span style="width:10px;height:10px;border-radius:3px;background:'+PAL[i]+';flex-shrink:0;display:inline-block;"></span>'
-                                  +'<strong>'+r.name+'</strong></span>',
-                                '<span class="val-mono">'+fmtN(r.total)+'</span>',
-                                '<span class="val-mono">'+pct(r.total,tot)+'</span>',
-                                barCell(r.total, max, PAL[i])
-                            ];
-                        })
-                    );
-                }
-            },
+                        });
+                    }
 
-            /* ── Monthly Trend ──────────────────────── */
-            trend:{
-                title:'Monthly Sales Trend', sub:'Sales · Purchases · Gross Profit — last 7 months',
-                icon:'bi-bar-chart-line-fill', tabs:['chart','table'],
-                stats: function(){
-                    var t=DATA.trend;
-                    var tS=t.sales.reduce(function(a,v){return a+v;},0);
-                    var tP=t.purchases.reduce(function(a,v){return a+v;},0);
-                    var tG=t.gp.reduce(function(a,v){return a+v;},0);
-                    return [
-                        {label:'Total Sales (7mo)',     val:fmtK(tS),                              color:'#1565c0'},
-                        {label:'Total Purchases (7mo)', val:fmtK(tP),                              color:'#e65100'},
-                        {label:'Total GP (7mo)',         val:fmtK(tG),                             color:'#2e7d32'},
-                        {label:'Avg Monthly Sales',     val:fmtK(t.sales.length?tS/t.sales.length:0), color:'#6a1b9a'},
-                    ];
-                },
-                chart: function(canvas){
-                    var t=DATA.trend;
-                    var ctx=canvas.getContext('2d');
-                    var sg=ctx.createLinearGradient(0,0,0,300);
-                    sg.addColorStop(0,'rgba(21,101,192,.7)');sg.addColorStop(1,'rgba(21,101,192,.15)');
-                    var pg=ctx.createLinearGradient(0,0,0,300);
-                    pg.addColorStop(0,'rgba(230,81,0,.65)');pg.addColorStop(1,'rgba(230,81,0,.1)');
-                    return new Chart(canvas,{
-                        data:{labels:t.labels, datasets:[
-                            {type:'bar',  label:'Sales',        data:t.sales,     backgroundColor:sg, borderRadius:5,borderSkipped:false,order:2},
-                            {type:'bar',  label:'Purchases',    data:t.purchases, backgroundColor:pg, borderRadius:5,borderSkipped:false,order:2},
-                            {type:'line', label:'Gross Profit', data:t.gp,
-                             borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.07)',
-                             pointBackgroundColor:'#2e7d32',pointRadius:5,pointHoverRadius:7,
-                             borderWidth:2.5,tension:.4,fill:true,order:1},
-                        ]},
-                        options:{
-                            responsive:true,maintainAspectRatio:true,
-                            interaction:{mode:'index',intersect:false},
-                            plugins:{
-                                legend:{position:'top',labels:{font:{size:11},padding:14,boxWidth:14,boxHeight:14}},
-                                tooltip:tipCfg()
+                    function rankedTable(rows, colLabel) {
+                        var max = Math.max.apply(null, rows.map(function(r){ return r.total; }).concat([1]));
+                        var tot = rows.reduce(function(a,r){ return a+r.total; }, 0) || 1;
+                        return tableHtml(
+                            ['#', colLabel, 'Total', 'Share', 'Bar'],
+                            rows.map(function(r, i){
+                                return [
+                                    '<span class="rank-badge '+rankCls(i)+'">'+(i+1)+'</span>',
+                                    '<strong>'+r.name+'</strong>',
+                                    '<span class="val-mono">'+fmtN(r.total)+'</span>',
+                                    '<span class="val-mono">'+pct(r.total,tot)+'</span>',
+                                    barCell(r.total, max, PAL[i])
+                                ];
+                            })
+                        );
+                    }
+
+                    var CONFIGS = {
+
+                        /* ── Customers ──────────────────────────── */
+                        customers:{
+                            title:'Top Customers by Sales', sub:'Year-to-date by gross invoice value',
+                            icon:'bi-people-fill', tabs:['chart','table'],
+                            stats:   function(){ return rankedStats(DATA.customers, 'Customer'); },
+                            chart:   function(c){ return rankedBarChart(c, DATA.customers, 'Sales'); },
+                            table:   function(){ return rankedTable(DATA.customers, 'Customer Name'); }
+                        },
+
+                        /* ── Salesmen ───────────────────────────── */
+                        salesmen:{
+                            title:'Top Salesmen by Sales', sub:'Year-to-date by gross invoice value',
+                            icon:'bi-person-badge-fill', tabs:['chart','table'],
+                            stats:   function(){ return rankedStats(DATA.salesmen, 'Salesman'); },
+                            chart:   function(c){ return rankedBarChart(c, DATA.salesmen, 'Sales'); },
+                            table:   function(){ return rankedTable(DATA.salesmen, 'Salesman Name'); }
+                        },
+
+                        /* ── Categories ─────────────────────────── */
+                        categories:{
+                            title:'Sales by Category', sub:'Year-to-date breakdown by inventory category',
+                            icon:'bi-pie-chart-fill', tabs:['chart','table'],
+                            stats: function(){
+                                var d = DATA.categories;
+                                var total = d.reduce(function(a,r){ return a+r.total; },0);
+                                var top   = d[0]||{};
+                                return [
+                                    {label:'Total Sales',   val:fmtK(total),         color:'#1565c0'},
+                                    {label:'Top Category',  val:top.name||'—',       color:'#2e7d32'},
+                                    {label:'Top Value',     val:fmtK(top.total||0),  color:'#e65100'},
+                                    {label:'Categories',    val:d.length.toString(), color:'#6a1b9a'},
+                                ];
                             },
-                            scales:scales()
-                        }
-                    });
-                },
-                table: function(){
-                    var t=DATA.trend;
-                    return tableHtml(
-                        ['Month','Sales','Purchases','Gross Profit','GP Margin'],
-                        t.labels.map(function(lbl,i){
-                            var gpm = t.sales[i]>0 ? ((t.gp[i]/t.sales[i])*100).toFixed(1)+'%':'—';
-                            return [
-                                '<strong>'+lbl+'</strong>',
-                                '<span class="val-mono">'+fmtN(t.sales[i])+'</span>',
-                                '<span class="val-mono">'+fmtN(t.purchases[i])+'</span>',
-                                '<span class="val-mono" style="color:#2e7d32;">'+fmtN(t.gp[i])+'</span>',
-                                '<span class="val-mono">'+gpm+'</span>'
-                            ];
-                        })
-                    );
-                }
-            },
-
-            /* ── Comparative ────────────────────────── */
-            comparative:{
-                title:'Comparative Sales', sub:'This Year vs Last Year — monthly',
-                icon:'bi-bar-chart-fill', tabs:['chart','table'],
-                stats: function(){
-                    var s=DATA.trend.sales;
-                    var tY=s.reduce(function(a,v){return a+v;},0);
-                    var lY=tY*0.78;
-                    var chg=lY>0?(((tY-lY)/lY)*100).toFixed(1)+'%':'—';
-                    return [
-                        {label:'This Year (7mo)',  val:fmtK(tY), color:'#1565c0'},
-                        {label:'Last Year (est)',  val:fmtK(lY), color:'#e65100'},
-                        {label:'Growth',           val:chg,      color:'#2e7d32'},
-                        {label:'Months Shown',     val:s.length.toString(), color:'#6a1b9a'},
-                    ];
-                },
-                chart: function(canvas){
-                    var t=DATA.trend;
-                    var lastY=t.sales.map(function(v){ return v*0.78; });
-                    return new Chart(canvas,{
-                        type:'line',
-                        data:{labels:t.labels, datasets:[
-                            {label:'This Year', data:t.sales,  borderColor:'#1565c0',
-                             backgroundColor:'rgba(21,101,192,.08)',
-                             pointBackgroundColor:'#1565c0',pointRadius:4,borderWidth:2.5,tension:.4,fill:true},
-                            {label:'Last Year', data:lastY, borderColor:'#e65100',
-                             backgroundColor:'transparent',
-                             pointBackgroundColor:'#e65100',pointRadius:3,borderWidth:2,tension:.4,borderDash:[5,4]},
-                        ]},
-                        options:{
-                            responsive:true,maintainAspectRatio:true,
-                            interaction:{mode:'index',intersect:false},
-                            plugins:{
-                                legend:{position:'top',labels:{font:{size:11},padding:14,boxWidth:14,boxHeight:14}},
-                                tooltip:tipCfg()
+                            chart: function(canvas){
+                                var d = DATA.categories;
+                                return new Chart(canvas, {
+                                    type:'doughnut',
+                                    data:{
+                                        labels: d.map(function(r){ return r.name; }),
+                                        datasets:[{
+                                            data: d.map(function(r){ return r.total; }),
+                                            backgroundColor: PAL.slice(0, d.length),
+                                            borderColor:'#fff', borderWidth:3, hoverOffset:10,
+                                        }]
+                                    },
+                                    options:{
+                                        responsive:true, maintainAspectRatio:true, cutout:'55%',
+                                        plugins:{
+                                            legend:{position:'right', labels:{font:{size:11},padding:14,boxWidth:14,boxHeight:14}},
+                                            tooltip:{backgroundColor:'#1a2332',padding:10,cornerRadius:7,
+                                                callbacks:{label:function(c){ return '  '+c.label+': '+fmtN(c.raw); }}}
+                                        }
+                                    }
+                                });
                             },
-                            scales:scales()
-                        }
-                    });
-                },
-                table: function(){
-                    var t=DATA.trend;
-                    var lastY=t.sales.map(function(v){ return v*0.78; });
-                    return tableHtml(
-                        ['Month','This Year','Last Year (Est.)','Difference','Growth'],
-                        t.labels.map(function(lbl,i){
-                            var diff=t.sales[i]-lastY[i];
-                            var gp=lastY[i]>0?(((diff/lastY[i])*100).toFixed(1)+'%'):'—';
-                            var up=diff>=0;
-                            return [
-                                '<strong>'+lbl+'</strong>',
-                                '<span class="val-mono">'+fmtN(t.sales[i])+'</span>',
-                                '<span class="val-mono">'+fmtN(lastY[i])+'</span>',
-                                '<span class="val-mono" style="color:'+(up?'#2e7d32':'#c62828')+';">'+(up?'+':'')+fmtN(diff)+'</span>',
-                                '<span style="font-weight:700;color:'+(up?'#2e7d32':'#c62828')+';">'+(up?'↑':'↓')+gp+'</span>'
-                            ];
-                        })
-                    );
+                            table: function(){
+                                var d = DATA.categories;
+                                var max = Math.max.apply(null, d.map(function(r){ return r.total; }).concat([1]));
+                                var tot = d.reduce(function(a,r){ return a+r.total; },0)||1;
+                                return tableHtml(
+                                    ['#','Category','Net Sales','Share','Bar'],
+                                    d.map(function(r,i){
+                                        return [
+                                            '<span class="rank-badge '+rankCls(i)+'">'+(i+1)+'</span>',
+                                            '<span style="display:flex;align-items:center;gap:7px;">'
+                                            +'<span style="width:10px;height:10px;border-radius:3px;background:'+PAL[i]+';flex-shrink:0;display:inline-block;"></span>'
+                                            +'<strong>'+r.name+'</strong></span>',
+                                            '<span class="val-mono">'+fmtN(r.total)+'</span>',
+                                            '<span class="val-mono">'+pct(r.total,tot)+'</span>',
+                                            barCell(r.total, max, PAL[i])
+                                        ];
+                                    })
+                                );
+                            }
+                        },
+
+                        /* ── Monthly Trend ──────────────────────── */
+                        trend:{
+                            title:'Monthly Sales Trend', sub:'Sales · Purchases · Gross Profit — last 7 months',
+                            icon:'bi-bar-chart-line-fill', tabs:['chart','table'],
+                            stats: function(){
+                                var t=DATA.trend;
+                                var tS=t.sales.reduce(function(a,v){return a+v;},0);
+                                var tP=t.purchases.reduce(function(a,v){return a+v;},0);
+                                var tG=t.gp.reduce(function(a,v){return a+v;},0);
+                                return [
+                                    {label:'Total Sales (7mo)',     val:fmtK(tS),                              color:'#1565c0'},
+                                    {label:'Total Purchases (7mo)', val:fmtK(tP),                              color:'#e65100'},
+                                    {label:'Total GP (7mo)',         val:fmtK(tG),                             color:'#2e7d32'},
+                                    {label:'Avg Monthly Sales',     val:fmtK(t.sales.length?tS/t.sales.length:0), color:'#6a1b9a'},
+                                ];
+                            },
+                            chart: function(canvas){
+                                var t=DATA.trend;
+                                var ctx=canvas.getContext('2d');
+                                var sg=ctx.createLinearGradient(0,0,0,300);
+                                sg.addColorStop(0,'rgba(21,101,192,.7)');sg.addColorStop(1,'rgba(21,101,192,.15)');
+                                var pg=ctx.createLinearGradient(0,0,0,300);
+                                pg.addColorStop(0,'rgba(230,81,0,.65)');pg.addColorStop(1,'rgba(230,81,0,.1)');
+                                return new Chart(canvas,{
+                                    data:{labels:t.labels, datasets:[
+                                            {type:'bar',  label:'Sales',        data:t.sales,     backgroundColor:sg, borderRadius:5,borderSkipped:false,order:2},
+                                            {type:'bar',  label:'Purchases',    data:t.purchases, backgroundColor:pg, borderRadius:5,borderSkipped:false,order:2},
+                                            {type:'line', label:'Gross Profit', data:t.gp,
+                                                borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.07)',
+                                                pointBackgroundColor:'#2e7d32',pointRadius:5,pointHoverRadius:7,
+                                                borderWidth:2.5,tension:.4,fill:true,order:1},
+                                        ]},
+                                    options:{
+                                        responsive:true,maintainAspectRatio:true,
+                                        interaction:{mode:'index',intersect:false},
+                                        plugins:{
+                                            legend:{position:'top',labels:{font:{size:11},padding:14,boxWidth:14,boxHeight:14}},
+                                            tooltip:tipCfg()
+                                        },
+                                        scales:scales()
+                                    }
+                                });
+                            },
+                            table: function(){
+                                var t=DATA.trend;
+                                return tableHtml(
+                                    ['Month','Sales','Purchases','Gross Profit','GP Margin'],
+                                    t.labels.map(function(lbl,i){
+                                        var gpm = t.sales[i]>0 ? ((t.gp[i]/t.sales[i])*100).toFixed(1)+'%':'—';
+                                        return [
+                                            '<strong>'+lbl+'</strong>',
+                                            '<span class="val-mono">'+fmtN(t.sales[i])+'</span>',
+                                            '<span class="val-mono">'+fmtN(t.purchases[i])+'</span>',
+                                            '<span class="val-mono" style="color:#2e7d32;">'+fmtN(t.gp[i])+'</span>',
+                                            '<span class="val-mono">'+gpm+'</span>'
+                                        ];
+                                    })
+                                );
+                            }
+                        },
+
+                        /* ── Comparative ────────────────────────── */
+                        comparative:{
+                            title:'Comparative Sales', sub:'This Year vs Last Year — monthly',
+                            icon:'bi-bar-chart-fill', tabs:['chart','table'],
+                            stats: function(){
+                                var s=DATA.trend.sales;
+                                var tY=s.reduce(function(a,v){return a+v;},0);
+                                var lY=tY*0.78;
+                                var chg=lY>0?(((tY-lY)/lY)*100).toFixed(1)+'%':'—';
+                                return [
+                                    {label:'This Year (7mo)',  val:fmtK(tY), color:'#1565c0'},
+                                    {label:'Last Year (est)',  val:fmtK(lY), color:'#e65100'},
+                                    {label:'Growth',           val:chg,      color:'#2e7d32'},
+                                    {label:'Months Shown',     val:s.length.toString(), color:'#6a1b9a'},
+                                ];
+                            },
+                            chart: function(canvas){
+                                var t=DATA.trend;
+                                var lastY=t.sales.map(function(v){ return v*0.78; });
+                                return new Chart(canvas,{
+                                    type:'line',
+                                    data:{labels:t.labels, datasets:[
+                                            {label:'This Year', data:t.sales,  borderColor:'#1565c0',
+                                                backgroundColor:'rgba(21,101,192,.08)',
+                                                pointBackgroundColor:'#1565c0',pointRadius:4,borderWidth:2.5,tension:.4,fill:true},
+                                            {label:'Last Year', data:lastY, borderColor:'#e65100',
+                                                backgroundColor:'transparent',
+                                                pointBackgroundColor:'#e65100',pointRadius:3,borderWidth:2,tension:.4,borderDash:[5,4]},
+                                        ]},
+                                    options:{
+                                        responsive:true,maintainAspectRatio:true,
+                                        interaction:{mode:'index',intersect:false},
+                                        plugins:{
+                                            legend:{position:'top',labels:{font:{size:11},padding:14,boxWidth:14,boxHeight:14}},
+                                            tooltip:tipCfg()
+                                        },
+                                        scales:scales()
+                                    }
+                                });
+                            },
+                            table: function(){
+                                var t=DATA.trend;
+                                var lastY=t.sales.map(function(v){ return v*0.78; });
+                                return tableHtml(
+                                    ['Month','This Year','Last Year (Est.)','Difference','Growth'],
+                                    t.labels.map(function(lbl,i){
+                                        var diff=t.sales[i]-lastY[i];
+                                        var gp=lastY[i]>0?(((diff/lastY[i])*100).toFixed(1)+'%'):'—';
+                                        var up=diff>=0;
+                                        return [
+                                            '<strong>'+lbl+'</strong>',
+                                            '<span class="val-mono">'+fmtN(t.sales[i])+'</span>',
+                                            '<span class="val-mono">'+fmtN(lastY[i])+'</span>',
+                                            '<span class="val-mono" style="color:'+(up?'#2e7d32':'#c62828')+';">'+(up?'+':'')+fmtN(diff)+'</span>',
+                                            '<span style="font-weight:700;color:'+(up?'#2e7d32':'#c62828')+';">'+(up?'↑':'↓')+gp+'</span>'
+                                        ];
+                                    })
+                                );
+                            }
+                        },
+                    };
+
+                    return CONFIGS[key] || null;
                 }
-            },
-        };
 
-        return CONFIGS[key] || null;
-    }
+                /* ── 11. Render active tab ───────────────────────────── */
+                function renderTab(tab) {
+                    var cfg = getConfig(currentKey);
+                    if (!cfg) return;
+                    activeTab = tab;
 
-    /* ── 11. Render active tab ───────────────────────────── */
-    function renderTab(tab) {
-        var cfg = getConfig(currentKey);
-        if (!cfg) return;
-        activeTab = tab;
+                    /* highlight active tab button */
+                    tabsEl.querySelectorAll('.exp-tab').forEach(function(t){
+                        t.classList.toggle('active', t.dataset.tab === tab);
+                    });
 
-        /* highlight active tab button */
-        tabsEl.querySelectorAll('.exp-tab').forEach(function(t){
-            t.classList.toggle('active', t.dataset.tab === tab);
-        });
+                    /* destroy previous chart */
+                    if (activeChart) { try { activeChart.destroy(); } catch(e){} activeChart = null; }
 
-        /* destroy previous chart */
-        if (activeChart) { try { activeChart.destroy(); } catch(e){} activeChart = null; }
+                    /* stats pills always shown */
+                    var html = statsHtml(cfg.stats());
 
-        /* stats pills always shown */
-        var html = statsHtml(cfg.stats());
+                    if (tab === 'chart') {
+                        html += '<div class="exp-chart-wrap"><canvas id="expCanvas" height="280"></canvas></div>';
+                        bodyEl.innerHTML = html;
+                        /* nextTick so canvas is in DOM */
+                        setTimeout(function(){
+                            var c = document.getElementById('expCanvas');
+                            if (c) activeChart = cfg.chart(c);
+                        }, 0);
+                    } else {
+                        html += cfg.table();
+                        bodyEl.innerHTML = html;
+                        /* animate bar fills */
+                        setTimeout(function(){
+                            bodyEl.querySelectorAll('.bar-fill').forEach(function(el){
+                                var target = el.style.width;
+                                el.style.transition = 'none';
+                                el.style.width = '0';
+                                setTimeout(function(){ el.style.transition='width .6s ease'; el.style.width=target; }, 30);
+                            });
+                        }, 0);
+                    }
+                }
 
-        if (tab === 'chart') {
-            html += '<div class="exp-chart-wrap"><canvas id="expCanvas" height="280"></canvas></div>';
-            bodyEl.innerHTML = html;
-            /* nextTick so canvas is in DOM */
-            setTimeout(function(){
-                var c = document.getElementById('expCanvas');
-                if (c) activeChart = cfg.chart(c);
-            }, 0);
-        } else {
-            html += cfg.table();
-            bodyEl.innerHTML = html;
-            /* animate bar fills */
-            setTimeout(function(){
-                bodyEl.querySelectorAll('.bar-fill').forEach(function(el){
-                    var target = el.style.width;
-                    el.style.transition = 'none';
-                    el.style.width = '0';
-                    setTimeout(function(){ el.style.transition='width .6s ease'; el.style.width=target; }, 30);
+                /* ── 12. Open modal ─────────────────────────────────── */
+                function openModal(key) {
+                    var cfg = getConfig(key);
+                    if (!cfg) { console.warn('No expand config for key:', key); return; }
+
+                    currentKey = key;
+
+                    /* update header */
+                    titleEl.textContent = cfg.title;
+                    subEl.textContent   = cfg.sub;
+                    iconEl.className    = 'bi ' + cfg.icon;
+
+                    /* show/hide tabs */
+                    tabsEl.querySelectorAll('.exp-tab').forEach(function(t){
+                        t.style.display = cfg.tabs.indexOf(t.dataset.tab) > -1 ? '' : 'none';
+                    });
+
+                    /* default to chart tab */
+                    renderTab('chart');
+
+                    overlay.classList.add('open');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                /* ── 13. Close modal ────────────────────────────────── */
+                function closeModal() {
+                    overlay.classList.remove('open');
+                    document.body.style.overflow = '';
+                    if (activeChart) { try { activeChart.destroy(); } catch(e){} activeChart = null; }
+                    currentKey = null;
+                    bodyEl.innerHTML = '';
+                }
+
+                /* ── 14. Tab switch ─────────────────────────────────── */
+                tabsEl.addEventListener('click', function(e){
+                    var btn = e.target.closest('.exp-tab');
+                    if (btn && btn.dataset.tab && btn.dataset.tab !== activeTab) {
+                        renderTab(btn.dataset.tab);
+                    }
                 });
-            }, 0);
-        }
-    }
 
-    /* ── 12. Open modal ─────────────────────────────────── */
-    function openModal(key) {
-        var cfg = getConfig(key);
-        if (!cfg) { console.warn('No expand config for key:', key); return; }
+                /* ── 15. Wire expand buttons ────────────────────────── */
+                document.querySelectorAll('.exp-trigger').forEach(function(btn){
+                    btn.addEventListener('click', function(e){
+                        e.stopPropagation();
+                        openModal(btn.dataset.expand);
+                    });
+                    /* double-click portlet title also opens */
+                    var hd = btn.closest('.portlet, .portlet') &&
+                        btn.closest('.portlet').querySelector('.portlet-hd-title');
+                    if (hd) {
+                        hd.style.cursor = 'pointer';
+                        hd.title = 'Double-click to expand';
+                        hd.addEventListener('dblclick', function(){
+                            openModal(btn.dataset.expand);
+                        });
+                    }
+                });
 
-        currentKey = key;
+                /* ── 16. Close triggers ─────────────────────────────── */
+                closeBtn.addEventListener('click', closeModal);
 
-        /* update header */
-        titleEl.textContent = cfg.title;
-        subEl.textContent   = cfg.sub;
-        iconEl.className    = 'bi ' + cfg.icon;
+                overlay.addEventListener('click', function(e){
+                    if (e.target === overlay) closeModal();
+                });
 
-        /* show/hide tabs */
-        tabsEl.querySelectorAll('.exp-tab').forEach(function(t){
-            t.style.display = cfg.tabs.indexOf(t.dataset.tab) > -1 ? '' : 'none';
-        });
+                document.addEventListener('keydown', function(e){
+                    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+                });
 
-        /* default to chart tab */
-        renderTab('chart');
+                console.log('[Expand Engine] Ready —',
+                    document.querySelectorAll('.exp-trigger').length, 'triggers wired.',
+                    'Keys:', Object.keys({customers:1,salesmen:1,categories:1,trend:1,comparative:1}).join(', '));
 
-        overlay.classList.add('open');
-        document.body.style.overflow = 'hidden';
-    }
-
-    /* ── 13. Close modal ────────────────────────────────── */
-    function closeModal() {
-        overlay.classList.remove('open');
-        document.body.style.overflow = '';
-        if (activeChart) { try { activeChart.destroy(); } catch(e){} activeChart = null; }
-        currentKey = null;
-        bodyEl.innerHTML = '';
-    }
-
-    /* ── 14. Tab switch ─────────────────────────────────── */
-    tabsEl.addEventListener('click', function(e){
-        var btn = e.target.closest('.exp-tab');
-        if (btn && btn.dataset.tab && btn.dataset.tab !== activeTab) {
-            renderTab(btn.dataset.tab);
-        }
-    });
-
-    /* ── 15. Wire expand buttons ────────────────────────── */
-    document.querySelectorAll('.exp-trigger').forEach(function(btn){
-        btn.addEventListener('click', function(e){
-            e.stopPropagation();
-            openModal(btn.dataset.expand);
-        });
-        /* double-click portlet title also opens */
-        var hd = btn.closest('.portlet, .portlet') &&
-                 btn.closest('.portlet').querySelector('.portlet-hd-title');
-        if (hd) {
-            hd.style.cursor = 'pointer';
-            hd.title = 'Double-click to expand';
-            hd.addEventListener('dblclick', function(){
-                openModal(btn.dataset.expand);
-            });
-        }
-    });
-
-    /* ── 16. Close triggers ─────────────────────────────── */
-    closeBtn.addEventListener('click', closeModal);
-
-    overlay.addEventListener('click', function(e){
-        if (e.target === overlay) closeModal();
-    });
-
-    document.addEventListener('keydown', function(e){
-        if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
-    });
-
-    console.log('[Expand Engine] Ready —',
-        document.querySelectorAll('.exp-trigger').length, 'triggers wired.',
-        'Keys:', Object.keys({customers:1,salesmen:1,categories:1,trend:1,comparative:1}).join(', '));
-
-})();
-</script>
-@endpush
+            })();
+        </script>
+    @endpush
