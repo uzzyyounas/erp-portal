@@ -405,838 +405,1102 @@
     </style>
 
 
-@endpush
 
-@section('content')
+    @section('content')
 
-    {{-- Page title --}}
-{{--    <div class="dash-page-title anim d1">--}}
-{{--        <h2>Home</h2>--}}
-{{--        <div class="dash-page-title-right">--}}
-{{--            Viewing: <a href="#">Portlet date settings ▾</a>--}}
-{{--            &nbsp;|&nbsp; <a href="#">Personalise ▾</a>--}}
-{{--            &nbsp;|&nbsp; <a href="#">Layout ▾</a>--}}
+        {{-- Page title --}}
+{{--        <div class="dash-page-title anim d1">--}}
+{{--            <h2>Home</h2>--}}
+{{--            <div class="dash-page-title-right">--}}
+{{--                Viewing: <a href="#">Portlet date settings ▾</a>--}}
+{{--                &nbsp;|&nbsp; <a href="#">Personalise ▾</a>--}}
+{{--                &nbsp;|&nbsp; <a href="#">Layout ▾</a>--}}
+{{--            </div>--}}
 {{--        </div>--}}
-{{--    </div>--}}
 
-    {{-- Three-column dashboard --}}
-    <div class="dash-3col">
+        {{-- Three-column dashboard --}}
+        <div class="dash-3col">
 
-        {{-- ════════════════ LEFT COLUMN ════════════════ --}}
-        <div class="dash-left">
+            {{-- ════════════════ LEFT COLUMN ════════════════ --}}
+            <div class="dash-left">
 
-            {{-- Reminders --}}
-            <div class="portlet anim d2">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-bell-fill"></i> Reminders</div>
-                    <div class="portlet-hd-actions">
-                        <div class="phd-btn" title="Refresh"><i class="bi bi-arrow-clockwise"></i></div>
-                        <div class="phd-btn" title="Settings"><i class="bi bi-gear"></i></div>
+                {{-- Reminders --}}
+                <div class="portlet anim d2">
+                    <div class="portlet-hd">
+                        <div class="portlet-hd-title"><i class="bi bi-bell-fill"></i> Reminders</div>
+                        <div class="portlet-hd-actions">
+                            <div class="phd-btn" title="Refresh"><i class="bi bi-arrow-clockwise"></i></div>
+                            <div class="phd-btn" title="Settings"><i class="bi bi-gear"></i></div>
+                        </div>
                     </div>
-                </div>
-                <div class="portlet-bd">
-                    @php
-                        $overdueLabel = $overdueCount > 0 ? 'Overdue Invoices' : 'No Overdue Invoices';
-                    @endphp
-                    <div class="reminder-item">
-                        <div class="reminder-count c-amber">{{ number_format($monthlySales/1000,0) }}K</div>
-                        <a href="#" class="reminder-link">Sales this Month</a>
-                    </div>
-                    @if($overdueCount > 0)
+                    <div class="portlet-bd">
+                        @php
+                            $overdueLabel = $overdueCount > 0 ? 'Overdue Invoices' : 'No Overdue Invoices';
+                        @endphp
                         <div class="reminder-item">
-                            <div class="reminder-count c-red">{{ $overdueCount }}</div>
-                            <a href="#" class="reminder-link">Overdue Invoices to collect</a>
+                            <div class="reminder-count c-amber">{{ number_format($monthlySales/1000,0) }}K</div>
+                            <a href="#" class="reminder-link">Sales this Month</a>
                         </div>
-                    @endif
-                    <div class="reminder-item">
-                        <div class="reminder-count c-blue">{{ number_format($totalReceivables/1000,0) }}K</div>
-                        <a href="#" class="reminder-link">Outstanding Receivables</a>
-                    </div>
-                    <div class="reminder-item">
-                        <div class="reminder-count c-amber">{{ number_format($totalPayables/1000,0) }}K</div>
-                        <a href="#" class="reminder-link">Payables due to Suppliers</a>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Comparative Sales mini chart --}}
-            <div class="portlet anim d3">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-bar-chart-fill"></i> Comparative Sales</div>
-                    <div class="portlet-hd-actions">
-                        <div class="phd-btn exp-trigger" data-expand="comparative" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div>
-                    </div>
-                </div>
-                <div class="portlet-bd">
-                    <select class="compare-select mb-2">
-                        <option>This Year vs Last Year</option>
-                        <option>This Month vs Last Month</option>
-                    </select>
-                    <canvas id="compareMini" height="130"></canvas>
-                    <div style="display:flex;justify-content:space-between;margin-top:6px;">
-                        <div style="display:flex;align-items:center;gap:4px;font-size:.65rem;color:var(--text-sm);">
-                            <div style="width:10px;height:3px;background:var(--blue);border-radius:2px;"></div> This Year
+                        @if($overdueCount > 0)
+                            <div class="reminder-item">
+                                <div class="reminder-count c-red">{{ $overdueCount }}</div>
+                                <a href="#" class="reminder-link">Overdue Invoices to collect</a>
+                            </div>
+                        @endif
+                        <div class="reminder-item">
+                            <div class="reminder-count c-blue">{{ number_format($totalReceivables/1000,0) }}K</div>
+                            <a href="#" class="reminder-link">Outstanding Receivables</a>
                         </div>
-                        <div style="display:flex;align-items:center;gap:4px;font-size:.65rem;color:var(--text-sm);">
-                            <div style="width:10px;height:3px;background:var(--accent);border-radius:2px;"></div> Last Year
+                        <div class="reminder-item">
+                            <div class="reminder-count c-amber">{{ number_format($totalPayables/1000,0) }}K</div>
+                            <a href="#" class="reminder-link">Payables due to Suppliers</a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Top Sales Reps --}}
-            <div class="portlet anim d4">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-person-badge-fill"></i> Top Salesmen by Sales</div>
-                    <div class="portlet-hd-actions">
-                        <div class="phd-btn exp-trigger" data-expand="salesmen" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div>
+                {{-- Comparative Sales mini chart --}}
+                <div class="portlet anim d3">
+                    <div class="portlet-hd">
+                        <div class="portlet-hd-title"><i class="bi bi-bar-chart-fill"></i> Comparative Sales</div>
+                        <div class="portlet-hd-actions">
+                            <div class="phd-btn exp-trigger" data-expand="comparative" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div>
+                        </div>
+                    </div>
+                    <div class="portlet-bd">
+                        <select class="compare-select mb-2">
+                            <option>This Year vs Last Year</option>
+                            <option>This Month vs Last Month</option>
+                        </select>
+                        <canvas id="compareMini" height="130"></canvas>
+                        <div style="display:flex;justify-content:space-between;margin-top:6px;">
+                            <div style="display:flex;align-items:center;gap:4px;font-size:.65rem;color:var(--text-sm);">
+                                <div style="width:10px;height:3px;background:var(--blue);border-radius:2px;"></div> This Year
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;font-size:.65rem;color:var(--text-sm);">
+                                <div style="width:10px;height:3px;background:var(--accent);border-radius:2px;"></div> Last Year
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="portlet-bd p0" style="padding:8px 12px;">
-                    @php $maxCust = collect($topCustomers)->max('total') ?: 1; @endphp
-                    @forelse($topCustomers as $i => $c)
-                        <div class="rep-row">
-                            <div class="rep-num">{{ $i+1 }}</div>
-                            <div class="rep-name">{{ $c->name }}</div>
-                            <div class="rep-bar"><div class="rep-fill" style="width:{{ number_format(($c->total/$maxCust)*100,1) }}%;"></div></div>
-                            <div class="rep-val">{{ number_format($c->total/1000,1) }}K</div>
+
+                {{-- Top Sales Reps --}}
+                <div class="portlet anim d4">
+                    <div class="portlet-hd">
+                        <div class="portlet-hd-title"><i class="bi bi-person-badge-fill"></i> Top Salesmen by Sales</div>
+                        <div class="portlet-hd-actions">
+                            <div class="phd-btn exp-trigger" data-expand="salesmen" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div>
                         </div>
-                    @empty
-                        <div style="text-align:center;color:var(--text-sm);font-size:.75rem;padding:12px;">No data</div>
-                    @endforelse
+                    </div>
+                    <div class="portlet-bd p0" style="padding:8px 12px;">
+                        @php $maxCust = collect($topCustomers)->max('total') ?: 1; @endphp
+                        @forelse($topCustomers as $i => $c)
+                            <div class="rep-row">
+                                <div class="rep-num">{{ $i+1 }}</div>
+                                <div class="rep-name">{{ $c->name }}</div>
+                                <div class="rep-bar"><div class="rep-fill" style="width:{{ number_format(($c->total/$maxCust)*100,1) }}%;"></div></div>
+                                <div class="rep-val">{{ number_format($c->total/1000,1) }}K</div>
+                            </div>
+                        @empty
+                            <div style="text-align:center;color:var(--text-sm);font-size:.75rem;padding:12px;">No data</div>
+                        @endforelse
+                    </div>
                 </div>
+
             </div>
 
-        </div>
+            {{-- ════════════════ MAIN COLUMN ════════════════ --}}
+            <div class="dash-main">
 
-        {{-- ════════════════ MAIN COLUMN ════════════════ --}}
-        <div class="dash-main">
+                {{-- Tile Cards --}}
+                <div class="tile-grid anim d2">
+                    <a href="#" class="tile-card tc-orange">
+                        <div class="tc-label">Total Sales YTD</div>
+                        <div class="tc-val">{{ number_format($ytdNetSales/1000000,2) }}M</div>
+                        <div class="tc-sub">Net invoiced amount</div>
+                        <i class="bi bi-graph-up-arrow tc-icon"></i>
+                    </a>
+                    <a href="#" class="tile-card tc-pink">
+                        <div class="tc-label">Open Receivables</div>
+                        <div class="tc-val">{{ number_format($totalReceivables/1000,0) }}K</div>
+                        <div class="tc-sub">{{ $overdueCount }} overdue invoices</div>
+                        <i class="bi bi-cash-stack tc-icon"></i>
+                    </a>
+                    <a href="#" class="tile-card tc-teal">
+                        <div class="tc-label">Gross Profit YTD</div>
+                        <div class="tc-val">{{ $gpMarginPct }}%</div>
+                        <div class="tc-sub">{{ number_format($ytdGrossProfit/1000,0) }}K earned</div>
+                        <i class="bi bi-bar-chart-steps tc-icon"></i>
+                    </a>
+                    <a href="#" class="tile-card tc-blue">
+                        <div class="tc-label">Total Payables</div>
+                        <div class="tc-val">{{ number_format($totalPayables/1000,0) }}K</div>
+                        <div class="tc-sub">Outstanding to suppliers</div>
+                        <i class="bi bi-credit-card-2-back tc-icon"></i>
+                    </a>
+                </div>
 
-            {{-- Tile Cards --}}
-            <div class="tile-grid anim d2">
-                <a href="#" class="tile-card tc-orange">
-                    <div class="tc-label">Total Sales YTD</div>
-                    <div class="tc-val">{{ number_format($ytdNetSales/1000000,2) }}M</div>
-                    <div class="tc-sub">Net invoiced amount</div>
-                    <i class="bi bi-graph-up-arrow tc-icon"></i>
-                </a>
-                <a href="#" class="tile-card tc-pink">
-                    <div class="tc-label">Open Receivables</div>
-                    <div class="tc-val">{{ number_format($totalReceivables/1000,0) }}K</div>
-                    <div class="tc-sub">{{ $overdueCount }} overdue invoices</div>
-                    <i class="bi bi-cash-stack tc-icon"></i>
-                </a>
-                <a href="#" class="tile-card tc-teal">
-                    <div class="tc-label">Gross Profit YTD</div>
-                    <div class="tc-val">{{ $gpMarginPct }}%</div>
-                    <div class="tc-sub">{{ number_format($ytdGrossProfit/1000,0) }}K earned</div>
-                    <i class="bi bi-bar-chart-steps tc-icon"></i>
-                </a>
-                <a href="#" class="tile-card tc-blue">
-                    <div class="tc-label">Total Payables</div>
-                    <div class="tc-val">{{ number_format($totalPayables/1000,0) }}K</div>
-                    <div class="tc-sub">Outstanding to suppliers</div>
-                    <i class="bi bi-credit-card-2-back tc-icon"></i>
-                </a>
-            </div>
-
-            {{-- Navigation Shortcuts --}}
-{{--            <div class="portlet anim d3">--}}
-{{--                <div class="portlet-hd">--}}
-{{--                    <div class="portlet-hd-title"><i class="bi bi-grid-3x3-gap-fill"></i> Navigation Shortcut Group</div>--}}
-{{--                    <div class="portlet-hd-actions">--}}
-{{--                        <div class="phd-btn"><i class="bi bi-pencil"></i></div>--}}
-{{--                        <div class="phd-btn"><i class="bi bi-x"></i></div>--}}
+                {{-- Navigation Shortcuts --}}
+{{--                <div class="portlet anim d3">--}}
+{{--                    <div class="portlet-hd">--}}
+{{--                        <div class="portlet-hd-title"><i class="bi bi-grid-3x3-gap-fill"></i> Navigation Shortcut Group</div>--}}
+{{--                        <div class="portlet-hd-actions">--}}
+{{--                            <div class="phd-btn"><i class="bi bi-pencil"></i></div>--}}
+{{--                            <div class="phd-btn"><i class="bi bi-x"></i></div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <div class="portlet-bd">--}}
+{{--                        @forelse($sidebarModules as $module)--}}
+{{--                            <div class="shortcut-section mb-3">--}}
+{{--                                <div class="shortcut-section-title">--}}
+{{--                                    <i class="bi bi-list-ul" style="color:var(--brand);"></i>--}}
+{{--                                    <i class="bi {{ $module->icon }}" style="color:{{ $module->color }};"></i>--}}
+{{--                                    {{ $module->name }}--}}
+{{--                                </div>--}}
+{{--                                @php--}}
+{{--                                    $items = $module->activeMenuItems->where('type','!=','divider')->chunk(--}}
+{{--                                        max(1, (int)ceil($module->activeMenuItems->where('type','!=','divider')->count() / 4))--}}
+{{--                                    );--}}
+{{--                                @endphp--}}
+{{--                                <div class="shortcut-cols">--}}
+{{--                                    @foreach($items as $chunk)--}}
+{{--                                        <div>--}}
+{{--                                            <div class="shortcut-col-hd">--}}
+{{--                                                @if($loop->first) Reports @elseif($loop->index===1) Forms @else Links @endif--}}
+{{--                                            </div>--}}
+{{--                                            @foreach($chunk as $item)--}}
+{{--                                                <a href="{{ $item->url }}" class="shortcut-link">--}}
+{{--                                                    <i class="bi {{ $item->icon ?: 'bi-file-text' }}"></i>--}}
+{{--                                                    {{ $item->name }}--}}
+{{--                                                </a>--}}
+{{--                                            @endforeach--}}
+{{--                                        </div>--}}
+{{--                                    @endforeach--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                        @empty--}}
+{{--                            <div style="text-align:center;color:var(--text-sm);font-size:.78rem;padding:14px;">No modules assigned.</div>--}}
+{{--                        @endforelse--}}
 {{--                    </div>--}}
 {{--                </div>--}}
-{{--                <div class="portlet-bd">--}}
-{{--                    @forelse($sidebarModules as $module)--}}
-{{--                        <div class="shortcut-section mb-3">--}}
-{{--                            <div class="shortcut-section-title">--}}
-{{--                                <i class="bi bi-list-ul" style="color:var(--brand);"></i>--}}
-{{--                                <i class="bi {{ $module->icon }}" style="color:{{ $module->color }};"></i>--}}
-{{--                                {{ $module->name }}--}}
-{{--                            </div>--}}
-{{--                            @php--}}
-{{--                                $items = $module->activeMenuItems->where('type','!=','divider')->chunk(--}}
-{{--                                    max(1, (int)ceil($module->activeMenuItems->where('type','!=','divider')->count() / 4))--}}
-{{--                                );--}}
-{{--                            @endphp--}}
-{{--                            <div class="shortcut-cols">--}}
-{{--                                @foreach($items as $chunk)--}}
-{{--                                    <div>--}}
-{{--                                        <div class="shortcut-col-hd">--}}
-{{--                                            @if($loop->first) Reports @elseif($loop->index===1) Forms @else Links @endif--}}
-{{--                                        </div>--}}
-{{--                                        @foreach($chunk as $item)--}}
-{{--                                            <a href="{{ $item->url }}" class="shortcut-link">--}}
-{{--                                                <i class="bi {{ $item->icon ?: 'bi-file-text' }}"></i>--}}
-{{--                                                {{ $item->name }}--}}
-{{--                                            </a>--}}
-{{--                                        @endforeach--}}
-{{--                                    </div>--}}
-{{--                                @endforeach--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    @empty--}}
-{{--                        <div style="text-align:center;color:var(--text-sm);font-size:.78rem;padding:14px;">No modules assigned.</div>--}}
-{{--                    @endforelse--}}
-{{--                </div>--}}
-{{--            </div>--}}
 
-            {{-- Key Performance Indicators --}}
-            <div class="portlet anim d4">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-speedometer2"></i> Key Performance Indicators</div>
-                    <div class="portlet-hd-actions">
-                        <div class="phd-btn"><i class="bi bi-arrows-angle-expand"></i></div>
-                        <div class="phd-btn"><i class="bi bi-gear"></i></div>
+                {{-- Key Performance Indicators --}}
+                <div class="portlet anim d4">
+                    <div class="portlet-hd">
+                        <div class="portlet-hd-title"><i class="bi bi-speedometer2"></i> Key Performance Indicators</div>
+                        <div class="portlet-hd-actions">
+                            <div class="phd-btn"><i class="bi bi-arrows-angle-expand"></i></div>
+                            <div class="phd-btn"><i class="bi bi-gear"></i></div>
+                        </div>
                     </div>
-                </div>
-                <div class="portlet-bd p0">
-                    {{-- Big change numbers --}}
-                    @php
-                        $sd = $prevMonthlySales>0?(($monthlySales-$prevMonthlySales)/$prevMonthlySales)*100:0;
-                        $pd = $prevMonthlyPurchases>0?(($monthlyPurchases-$prevMonthlyPurchases)/$prevMonthlyPurchases)*100:0;
-                    @endphp
-                    <div class="kpi-big-grid" style="padding:12px 12px 8px;">
-                        <div class="kpi-big kb-green">
-                            <div class="kpi-big-label">Sales</div>
-                            <div class="kpi-big-change change-{{ $sd>=0?'up':'down' }}">
-                                {{ $sd>=0?'↑':'↓' }}{{ number_format(abs($sd),1) }}%
+                    <div class="portlet-bd p0">
+                        {{-- Big change numbers --}}
+                        @php
+                            $sd = $prevMonthlySales>0?(($monthlySales-$prevMonthlySales)/$prevMonthlySales)*100:0;
+                            $pd = $prevMonthlyPurchases>0?(($monthlyPurchases-$prevMonthlyPurchases)/$prevMonthlyPurchases)*100:0;
+                        @endphp
+                        <div class="kpi-big-grid" style="padding:12px 12px 8px;">
+                            <div class="kpi-big kb-green">
+                                <div class="kpi-big-label">Sales</div>
+                                <div class="kpi-big-change change-{{ $sd>=0?'up':'down' }}">
+                                    {{ $sd>=0?'↑':'↓' }}{{ number_format(abs($sd),1) }}%
+                                </div>
+                                <canvas id="spark0" height="36"></canvas>
                             </div>
-                            <canvas id="spark0" height="36"></canvas>
-                        </div>
-                        <div class="kpi-big kb-blue">
-                            <div class="kpi-big-label">Purchases</div>
-                            <div class="kpi-big-change {{ $pd<=0?'change-up':'change-down' }}">
-                                {{ $pd>=0?'↑':'↓' }}{{ number_format(abs($pd),1) }}%
+                            <div class="kpi-big kb-blue">
+                                <div class="kpi-big-label">Purchases</div>
+                                <div class="kpi-big-change {{ $pd<=0?'change-up':'change-down' }}">
+                                    {{ $pd>=0?'↑':'↓' }}{{ number_format(abs($pd),1) }}%
+                                </div>
+                                <canvas id="spark1" height="36"></canvas>
                             </div>
-                            <canvas id="spark1" height="36"></canvas>
-                        </div>
-                        <div class="kpi-big kb-amber">
-                            <div class="kpi-big-label">Gross Profit</div>
-                            <div class="kpi-big-change change-up">{{ $gpMarginPct }}%</div>
-                            <canvas id="spark2" height="36"></canvas>
-                        </div>
-                        <div class="kpi-big kb-red">
-                            <div class="kpi-big-label">Overdue</div>
-                            <div class="kpi-big-change {{ $overdueCount>0?'change-down':'change-up' }}">
-                                {{ $overdueCount }}
+                            <div class="kpi-big kb-amber">
+                                <div class="kpi-big-label">Gross Profit</div>
+                                <div class="kpi-big-change change-up">{{ $gpMarginPct }}%</div>
+                                <canvas id="spark2" height="36"></canvas>
                             </div>
-                            <canvas id="spark3" height="36"></canvas>
+                            <div class="kpi-big kb-red">
+                                <div class="kpi-big-label">Overdue</div>
+                                <div class="kpi-big-change {{ $overdueCount>0?'change-down':'change-up' }}">
+                                    {{ $overdueCount }}
+                                </div>
+                                <canvas id="spark3" height="36"></canvas>
+                            </div>
                         </div>
-                    </div>
 
-                    {{-- Indicator table --}}
-                    <div class="kpi-table-wrap" style="border-top:1px solid var(--border);">
-                        <table class="kpi-table">
-                            <thead>
-                            <tr>
-                                <th style="width:22px;"></th>
-                                <th>Indicator</th>
-                                <th>Period</th>
-                                <th>Current</th>
-                                <th>Previous</th>
-                                <th>Change</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><i class="bi bi-caret-down-fill" style="color:var(--text-sm);font-size:.65rem;"></i></td>
-                                <td class="indicator-name">Sales</td>
-                                <td><a href="#" class="period-link">This Month vs. Last Month</a></td>
-                                <td class="val-cell">{{ number_format($monthlySales,0) }}</td>
-                                <td class="val-cell">{{ number_format($prevMonthlySales,0) }}</td>
-                                <td class="change-cell {{ $sd>=0?'change-up':'change-down' }}">
-                                    {{ $sd>=0?'↑':'↓' }} {{ number_format(abs($sd),1) }}%
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td class="indicator-name">Purchases</td>
-                                <td><a href="#" class="period-link">This Month vs. Last Month</a></td>
-                                <td class="val-cell">{{ number_format($monthlyPurchases,0) }}</td>
-                                <td class="val-cell">{{ number_format($prevMonthlyPurchases,0) }}</td>
-                                <td class="change-cell {{ $pd<=0?'change-up':'change-down' }}">
-                                    {{ $pd>=0?'↑':'↓' }} {{ number_format(abs($pd),1) }}%
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td class="indicator-name">Gross Profit</td>
-                                <td><a href="#" class="period-link">Year to Date</a></td>
-                                <td class="val-cell">{{ number_format($ytdGrossProfit,0) }}</td>
-                                <td class="val-cell">—</td>
-                                <td class="change-cell change-up">{{ $gpMarginPct }}% margin</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td class="indicator-name">Receivables</td>
-                                <td><a href="#" class="period-link">Outstanding Balance</a></td>
-                                <td class="val-cell">{{ number_format($totalReceivables,0) }}</td>
-                                <td class="val-cell">—</td>
-                                <td class="change-cell {{ $overdueCount>0?'change-down':'change-up' }}">
-                                    {{ $overdueCount }} overdue
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td class="indicator-name">Payables</td>
-                                <td><a href="#" class="period-link">Outstanding Balance</a></td>
-                                <td class="val-cell">{{ number_format($totalPayables,0) }}</td>
-                                <td class="val-cell">—</td>
-                                <td class="change-cell change-up">Suppliers</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Monthly Sales Trend --}}
-            <div class="portlet anim d5">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-bar-chart-line-fill"></i> Monthly Sales Trend</div>
-                    <div class="portlet-hd-actions">
-                        <div class="phd-btn exp-trigger" data-expand="trend" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div>
-                    </div>
-                </div>
-                <div class="portlet-bd">
-                    <div class="trend-legend">
-                        <div class="tl-item"><div class="tl-dot" style="background:#1565c0;"></div>Sales</div>
-                        <div class="tl-item"><div class="tl-dot" style="background:#e8a020;"></div>Purchases</div>
-                        <div class="tl-item"><div class="tl-dot" style="background:#2e7d32;border-top:2px dashed #2e7d32;height:0;margin-top:2px;"></div>Gross Profit</div>
-                    </div>
-                    <canvas id="mainTrend" height="140"></canvas>
-                </div>
-            </div>
-
-        </div>
-
-        {{-- ════════════════ RIGHT COLUMN ════════════════ --}}
-        <div class="dash-right">
-
-            {{-- KPI Gauge 1: Receivables --}}
-            <div class="portlet anim d3">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-speedometer"></i> KPI Meter</div>
-                    <div class="portlet-hd-actions"><div class="phd-btn"><i class="bi bi-gear"></i></div></div>
-                </div>
-                <div class="portlet-bd">
-                    <select class="compare-select w-100 mb-2">
-                        <option>Open Receivables</option>
-                    </select>
-                    <div class="gauge-wrap">
-                        <canvas id="gauge1" height="100" style="max-width:160px;margin:0 auto;display:block;"></canvas>
-                        <div class="gauge-val">{{ number_format($totalReceivables/1000,0) }}K</div>
-                        <div class="gauge-lbl">Open Receivables</div>
-                        <div class="gauge-range">
-                            <span>0</span>
-                            <span>{{ number_format($totalReceivables/1000,0) }}K</span>
+                        {{-- Indicator table --}}
+                        <div class="kpi-table-wrap" style="border-top:1px solid var(--border);">
+                            <table class="kpi-table">
+                                <thead>
+                                <tr>
+                                    <th style="width:22px;"></th>
+                                    <th>Indicator</th>
+                                    <th>Period</th>
+                                    <th>Current</th>
+                                    <th>Previous</th>
+                                    <th>Change</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><i class="bi bi-caret-down-fill" style="color:var(--text-sm);font-size:.65rem;"></i></td>
+                                    <td class="indicator-name">Sales</td>
+                                    <td><a href="#" class="period-link">This Month vs. Last Month</a></td>
+                                    <td class="val-cell">{{ number_format($monthlySales,0) }}</td>
+                                    <td class="val-cell">{{ number_format($prevMonthlySales,0) }}</td>
+                                    <td class="change-cell {{ $sd>=0?'change-up':'change-down' }}">
+                                        {{ $sd>=0?'↑':'↓' }} {{ number_format(abs($sd),1) }}%
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="indicator-name">Purchases</td>
+                                    <td><a href="#" class="period-link">This Month vs. Last Month</a></td>
+                                    <td class="val-cell">{{ number_format($monthlyPurchases,0) }}</td>
+                                    <td class="val-cell">{{ number_format($prevMonthlyPurchases,0) }}</td>
+                                    <td class="change-cell {{ $pd<=0?'change-up':'change-down' }}">
+                                        {{ $pd>=0?'↑':'↓' }} {{ number_format(abs($pd),1) }}%
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="indicator-name">Gross Profit</td>
+                                    <td><a href="#" class="period-link">Year to Date</a></td>
+                                    <td class="val-cell">{{ number_format($ytdGrossProfit,0) }}</td>
+                                    <td class="val-cell">—</td>
+                                    <td class="change-cell change-up">{{ $gpMarginPct }}% margin</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="indicator-name">Receivables</td>
+                                    <td><a href="#" class="period-link">Outstanding Balance</a></td>
+                                    <td class="val-cell">{{ number_format($totalReceivables,0) }}</td>
+                                    <td class="val-cell">—</td>
+                                    <td class="change-cell {{ $overdueCount>0?'change-down':'change-up' }}">
+                                        {{ $overdueCount }} overdue
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="indicator-name">Payables</td>
+                                    <td><a href="#" class="period-link">Outstanding Balance</a></td>
+                                    <td class="val-cell">{{ number_format($totalPayables,0) }}</td>
+                                    <td class="val-cell">—</td>
+                                    <td class="change-cell change-up">Suppliers</td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- KPI Gauge 2: GP Margin --}}
-            <div class="portlet anim d4">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-speedometer"></i> KPI Meter</div>
-                    <div class="portlet-hd-actions"><div class="phd-btn"><i class="bi bi-gear"></i></div></div>
-                </div>
-                <div class="portlet-bd">
-                    <select class="compare-select w-100 mb-2">
-                        <option>GP Margin %</option>
-                    </select>
-                    <div class="gauge-wrap">
-                        <canvas id="gauge2" height="100" style="max-width:160px;margin:0 auto;display:block;"></canvas>
-                        <div class="gauge-val">{{ $gpMarginPct }}%</div>
-                        <div class="gauge-lbl">Gross Profit Margin</div>
-                        <div class="gauge-range"><span>0</span><span>100%</span></div>
+                {{-- Monthly Sales Trend --}}
+                <div class="portlet anim d5">
+                    <div class="portlet-hd">
+                        <div class="portlet-hd-title"><i class="bi bi-bar-chart-line-fill"></i> Monthly Sales Trend</div>
+                        <div class="portlet-hd-actions">
+                            <div class="phd-btn exp-trigger" data-expand="trend" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div>
+                        </div>
+                    </div>
+                    <div class="portlet-bd">
+                        <div class="trend-legend">
+                            <div class="tl-item"><div class="tl-dot" style="background:#1565c0;"></div>Sales</div>
+                            <div class="tl-item"><div class="tl-dot" style="background:#e8a020;"></div>Purchases</div>
+                            <div class="tl-item"><div class="tl-dot" style="background:#2e7d32;border-top:2px dashed #2e7d32;height:0;margin-top:2px;"></div>Gross Profit</div>
+                        </div>
+                        <canvas id="mainTrend" height="140"></canvas>
                     </div>
                 </div>
+
             </div>
 
-            {{-- Top 5 Customers --}}
-            <div class="portlet anim d5">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-people-fill"></i> Top Customers By Sales</div>
-                    <div class="portlet-hd-actions"><div class="phd-btn exp-trigger" data-expand="customers" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div></div>
+            {{-- ════════════════ RIGHT COLUMN ════════════════ --}}
+            <div class="dash-right">
+
+                {{-- KPI Gauge 1: Receivables --}}
+                <div class="portlet anim d3">
+                    <div class="portlet-hd">
+                        <div class="portlet-hd-title"><i class="bi bi-speedometer"></i> KPI Meter</div>
+                        <div class="portlet-hd-actions"><div class="phd-btn"><i class="bi bi-gear"></i></div></div>
+                    </div>
+                    <div class="portlet-bd">
+                        <select class="compare-select w-100 mb-2">
+                            <option>Open Receivables</option>
+                        </select>
+                        <div class="gauge-wrap">
+                            <canvas id="gauge1" height="100" style="max-width:160px;margin:0 auto;display:block;"></canvas>
+                            <div class="gauge-val">{{ number_format($totalReceivables/1000,0) }}K</div>
+                            <div class="gauge-lbl">Open Receivables</div>
+                            <div class="gauge-range">
+                                <span>0</span>
+                                <span>{{ number_format($totalReceivables/1000,0) }}K</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="portlet-bd">
-                    <select class="compare-select w-100 mb-2">
-                        <option>This Month</option>
-                        <option>This Year</option>
-                    </select>
-                    <canvas id="custPie" height="130" style="max-width:160px;margin:0 auto;display:block;"></canvas>
-                    <div style="margin-top:10px;">
-                        @foreach($topCustomers as $i => $c)
+
+                {{-- KPI Gauge 2: GP Margin --}}
+                <div class="portlet anim d4">
+                    <div class="portlet-hd">
+                        <div class="portlet-hd-title"><i class="bi bi-speedometer"></i> KPI Meter</div>
+                        <div class="portlet-hd-actions"><div class="phd-btn"><i class="bi bi-gear"></i></div></div>
+                    </div>
+                    <div class="portlet-bd">
+                        <select class="compare-select w-100 mb-2">
+                            <option>GP Margin %</option>
+                        </select>
+                        <div class="gauge-wrap">
+                            <canvas id="gauge2" height="100" style="max-width:160px;margin:0 auto;display:block;"></canvas>
+                            <div class="gauge-val">{{ $gpMarginPct }}%</div>
+                            <div class="gauge-lbl">Gross Profit Margin</div>
+                            <div class="gauge-range"><span>0</span><span>100%</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Top 5 Customers --}}
+                <div class="portlet anim d5">
+                    <div class="portlet-hd">
+                        <div class="portlet-hd-title"><i class="bi bi-people-fill"></i> Top Customers By Sales</div>
+                        <div class="portlet-hd-actions"><div class="phd-btn exp-trigger" data-expand="customers" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div></div>
+                    </div>
+                    <div class="portlet-bd">
+                        <select class="compare-select w-100 mb-2">
+                            <option>This Month</option>
+                            <option>This Year</option>
+                        </select>
+                        <canvas id="custPie" height="130" style="max-width:160px;margin:0 auto;display:block;"></canvas>
+                        <div style="margin-top:10px;">
+                            @foreach($topCustomers as $i => $c)
+                                <div class="cust-row">
+                                    <div class="cust-rank">{{ $i+1 }}</div>
+                                    <div class="cust-name">{{ $c->name }}</div>
+                                    <div class="cust-val">{{ number_format($c->total/1000,0) }}K</div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Sales by Category --}}
+                <div class="portlet anim d6">
+                    <div class="portlet-hd">
+                        <div class="portlet-hd-title"><i class="bi bi-pie-chart-fill"></i> Sales by Category</div>
+                        <div class="portlet-hd-actions"><div class="phd-btn exp-trigger" data-expand="categories" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div></div>
+                    </div>
+                    <div class="portlet-bd">
+                        <canvas id="catPie" height="130" style="max-width:160px;margin:0 auto;display:block;"></canvas>
+                        @foreach($salesByCategory as $i => $cat)
                             <div class="cust-row">
                                 <div class="cust-rank">{{ $i+1 }}</div>
-                                <div class="cust-name">{{ $c->name }}</div>
-                                <div class="cust-val">{{ number_format($c->total/1000,0) }}K</div>
+                                <div class="cust-name">{{ $cat->category ?: 'Other' }}</div>
+                                <div class="cust-val">{{ number_format($cat->total/1000,0) }}K</div>
                             </div>
                         @endforeach
                     </div>
                 </div>
-            </div>
 
-            {{-- Sales by Category --}}
-            <div class="portlet anim d6">
-                <div class="portlet-hd">
-                    <div class="portlet-hd-title"><i class="bi bi-pie-chart-fill"></i> Sales by Category</div>
-                    <div class="portlet-hd-actions"><div class="phd-btn exp-trigger" data-expand="categories" title="Expand"><i class="bi bi-arrows-angle-expand"></i></div></div>
-                </div>
-                <div class="portlet-bd">
-                    <canvas id="catPie" height="130" style="max-width:160px;margin:0 auto;display:block;"></canvas>
-                    @foreach($salesByCategory as $i => $cat)
-                        <div class="cust-row">
-                            <div class="cust-rank">{{ $i+1 }}</div>
-                            <div class="cust-name">{{ $cat->category ?: 'Other' }}</div>
-                            <div class="cust-val">{{ number_format($cat->total/1000,0) }}K</div>
-                        </div>
-                    @endforeach
-                </div>
             </div>
-
         </div>
-    </div>
 
-    @php
-        /* Pre-compute flat arrays for the expand modal JS — simple @json() only */
-        $expCustomers = collect($topCustomers)->map(fn($c) => [
-            'name'  => $c->name,
-            'total' => (float) $c->total,
-        ])->values()->toArray();
+        @php
+            /* Pre-compute flat arrays for the expand modal JS — simple @json() only */
+            $expCustomers = collect($topCustomers)->map(fn($c) => [
+                'name'  => $c->name,
+                'total' => (float) $c->total,
+            ])->values()->toArray();
 
-        $expSalesmen = collect($topCustomers)->map(fn($c) => [
-            'name'  => $c->name,
-            'total' => (float) $c->total,
-        ])->values()->toArray();
+            $expSalesmen = collect($topCustomers)->map(fn($c) => [
+                'name'  => $c->name,
+                'total' => (float) $c->total,
+            ])->values()->toArray();
 
-        $expCategories = collect($salesByCategory)->map(fn($c) => [
-            'name'  => $c->category ?: 'Other',
-            'total' => (float) $c->total,
-        ])->values()->toArray();
+            $expCategories = collect($salesByCategory)->map(fn($c) => [
+                'name'  => $c->category ?: 'Other',
+                'total' => (float) $c->total,
+            ])->values()->toArray();
 
-        $expTopSuppliers = collect($topSuppliers)->map(fn($s) => [
-            'name'  => $s->supp_name,
-            'total' => (float) $s->total,
-        ])->values()->toArray();
+            $expTopSuppliers = collect($topSuppliers)->map(fn($s) => [
+                'name'  => $s->supp_name,
+                'total' => (float) $s->total,
+            ])->values()->toArray();
 
-        $expTopItems = collect($topItems)->map(fn($i) => [
-            'name'  => $i->description ?: $i->stock_id,
-            'total' => (float) $i->total,
-            'qty'   => (float) $i->qty,
-        ])->values()->toArray();
-    @endphp
+            $expTopItems = collect($topItems)->map(fn($i) => [
+                'name'  => $i->description ?: $i->stock_id,
+                'total' => (float) $i->total,
+                'qty'   => (float) $i->qty,
+            ])->values()->toArray();
+
+            /* Extra vars for pie chart JS in main scripts block */
+            $expCustVals   = collect($topCustomers)->pluck('total')->map(fn($v) => (float)$v)->values()->toArray();
+            $expCustLabels = collect($topCustomers)->pluck('name')->values()->toArray();
+            $expCatVals    = collect($salesByCategory)->pluck('total')->map(fn($v) => (float)$v)->values()->toArray();
+            $expCatLabels  = collect($salesByCategory)->map(fn($c) => $c->category ?: 'Other')->values()->toArray();
+        @endphp
 
 
-    {{-- ═══════════════════════════════════════ EXPAND MODALS ════════════════ --}}
-    <div class="exp-overlay" id="expOverlay" role="dialog" aria-modal="true">
-        <div class="exp-modal" id="expModal">
+        {{-- ═══════════════════════════════════════ EXPAND MODALS ════════════════ --}}
+        <div class="exp-overlay" id="expOverlay" role="dialog" aria-modal="true">
+            <div class="exp-modal" id="expModal">
 
-            {{-- Header --}}
-            <div class="exp-modal-hd" id="expModalHd">
-                <div class="exp-modal-hd-icon" id="expModalIcon"><i class="bi bi-bar-chart-line"></i></div>
-                <div>
-                    <h5 id="expModalTitle">Report</h5>
-                    <small id="expModalSub">{{ now()->format('Y') }} — Expanded View</small>
+                {{-- Header --}}
+                <div class="exp-modal-hd" id="expModalHd">
+                    <div class="exp-modal-hd-icon" id="expModalIcon"><i class="bi bi-bar-chart-line"></i></div>
+                    <div>
+                        <h5 id="expModalTitle">Report</h5>
+                        <small id="expModalSub">{{ now()->format('Y') }} — Expanded View</small>
+                    </div>
+                    <button class="exp-close" id="expClose" title="Close (Esc)">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                 </div>
-                <button class="exp-close" id="expClose" title="Close (Esc)">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
 
-            {{-- Tab bar --}}
-            <div class="exp-tabs" id="expTabs">
-                <button class="exp-tab active" data-tab="chart">
-                    <i class="bi bi-bar-chart-line"></i> Chart
-                </button>
-                <button class="exp-tab" data-tab="table">
-                    <i class="bi bi-table"></i> Full Data
-                </button>
-            </div>
+                {{-- Tab bar --}}
+                <div class="exp-tabs" id="expTabs">
+                    <button class="exp-tab active" data-tab="chart">
+                        <i class="bi bi-bar-chart-line"></i> Chart
+                    </button>
+                    <button class="exp-tab" data-tab="table">
+                        <i class="bi bi-table"></i> Full Data
+                    </button>
+                </div>
 
-            {{-- Body --}}
-            <div class="exp-modal-body" id="expModalBody">
-                {{-- Content injected by JS --}}
-            </div>
+                {{-- Body --}}
+                <div class="exp-modal-body" id="expModalBody">
+                    {{-- Content injected by JS --}}
+                </div>
 
+            </div>
         </div>
-    </div>
 
-@endsection
+    @endsection
 
-@push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+    @push('scripts')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+        <script>
+            (function(){
+                Chart.defaults.font.family = "'Nunito Sans', sans-serif";
+                Chart.defaults.color = '#6b7c93';
 
-            const overlay = document.getElementById('expOverlay');
-            const modalBody = document.getElementById('expModalBody');
-            const modalTitle = document.getElementById('expModalTitle');
-            const closeBtn = document.getElementById('expClose');
-            const tabs = document.querySelectorAll('.exp-tab');
+                const labels    = @json($chartLabels);
+                const sales     = @json($chartSales);
+                const purchases = @json($chartPurchases);
+                const gp        = @json($chartGP);
+                const fmtC = v => new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(v);
+                const fmtF = v => new Intl.NumberFormat().format(v);
 
-            /* Sample data from blade */
-            const modalData = {
-                trend: {
-                    title: 'Monthly Sales Trend',
-                    content: `
-                <div class="exp-stats">
-                    <div class="exp-stat">
-                        <div class="exp-stat-val">{{ number_format($monthlySales,0) }}</div>
-                        <div class="exp-stat-lbl">Monthly Sales</div>
-                    </div>
+                /* ── Shared tooltip ──────────────────────────────────────── */
+                const tip = {
+                    backgroundColor:'#1a2332', padding:10, cornerRadius:6,
+                    titleFont:{family:"'Lexend',sans-serif",size:11,weight:'700'},
+                    bodyFont:{family:"'JetBrains Mono',monospace",size:10},
+                    callbacks:{ label:c=>'  '+c.dataset.label+': '+fmtF(c.raw) }
+                };
 
-                    <div class="exp-stat">
-                        <div class="exp-stat-val">{{ number_format($monthlyPurchases,0) }}</div>
-                        <div class="exp-stat-lbl">Purchases</div>
-                    </div>
+                /* ── 1. Main trend (bars + line) ────────────────────────── */
+                const mt = document.getElementById('mainTrend').getContext('2d');
+                const sg = mt.createLinearGradient(0,0,0,180);
+                sg.addColorStop(0,'rgba(21,101,192,.75)'); sg.addColorStop(1,'rgba(21,101,192,.35)');
+                const pg = mt.createLinearGradient(0,0,0,180);
+                pg.addColorStop(0,'rgba(232,160,32,.65)'); pg.addColorStop(1,'rgba(232,160,32,.25)');
 
-                    <div class="exp-stat">
-                        <div class="exp-stat-val">{{ $gpMarginPct }}%</div>
-                        <div class="exp-stat-lbl">GP Margin</div>
-                    </div>
+                new Chart(mt,{
+                    data:{ labels, datasets:[
+                            {type:'bar',  label:'Sales',        data:sales,     backgroundColor:sg, borderRadius:3, borderSkipped:false, order:2},
+                            {type:'bar',  label:'Purchases',    data:purchases, backgroundColor:pg, borderRadius:3, borderSkipped:false, order:2},
+                            {type:'line', label:'Gross Profit', data:gp, borderColor:'#2e7d32', backgroundColor:'rgba(46,125,50,.07)',
+                                pointBackgroundColor:'#2e7d32', pointRadius:3, borderWidth:2, tension:.4, fill:true, order:1},
+                        ]},
+                    options:{
+                        responsive:true, maintainAspectRatio:true,
+                        interaction:{mode:'index',intersect:false},
+                        plugins:{legend:{display:false}, tooltip:tip},
+                        scales:{
+                            x:{grid:{display:false},border:{display:false},
+                                ticks:{font:{size:9,weight:'600'},color:'#94a3b8'}},
+                            y:{grid:{color:'#edf1f9'},border:{display:false},
+                                ticks:{font:{family:"'JetBrains Mono'",size:9},color:'#94a3b8',callback:fmtC,maxTicksLimit:5}}
+                        }
+                    }
+                });
 
-                    <div class="exp-stat">
-                        <div class="exp-stat-val">{{ $overdueCount }}</div>
-                        <div class="exp-stat-lbl">Overdue</div>
-                    </div>
-                </div>
+                /* ── 2. Comparative mini chart ──────────────────────────── */
+                new Chart(document.getElementById('compareMini'),{
+                    type:'line',
+                    data:{ labels, datasets:[
+                            {label:'This Year', data:sales, borderColor:'#1565c0', backgroundColor:'rgba(21,101,192,.1)',
+                                pointRadius:2, borderWidth:1.8, tension:.4, fill:true},
+                            {label:'Last Year', data:sales.map(v=>v*0.78+(Math.random()-.5)*v*.1),
+                                borderColor:'#e8a020', backgroundColor:'transparent',
+                                pointRadius:2, borderWidth:1.8, tension:.4, borderDash:[4,3]},
+                        ]},
+                    options:{
+                        responsive:true, maintainAspectRatio:true,
+                        plugins:{legend:{display:false}, tooltip:tip},
+                        scales:{
+                            x:{grid:{display:false},border:{display:false},ticks:{font:{size:8},color:'#94a3b8'}},
+                            y:{grid:{color:'#edf1f9'},border:{display:false},
+                                ticks:{font:{family:"'JetBrains Mono'",size:8},color:'#94a3b8',callback:fmtC,maxTicksLimit:4}}
+                        }
+                    }
+                });
 
-                <div class="exp-chart-wrap">
-                    <canvas id="expandedTrendChart" height="120"></canvas>
-                </div>
-            `
-                },
+                /* ── 3. Sparklines ──────────────────────────────────────── */
+                const sparkColors = ['#2e7d32','#1565c0','#e65100','#c62828'];
+                [sales, purchases, gp, Array(labels.length).fill(0).map((_,i)=>i*2)].forEach((data,i)=>{
+                    const el = document.getElementById('spark'+i);
+                    if(!el) return;
+                    new Chart(el,{
+                        type:'line',
+                        data:{ labels, datasets:[{
+                                data, borderColor:sparkColors[i], backgroundColor:'transparent',
+                                pointRadius:0, borderWidth:1.5, tension:.4
+                            }]},
+                        options:{
+                            responsive:true, animation:false,
+                            plugins:{legend:{display:false},tooltip:{enabled:false}},
+                            scales:{x:{display:false},y:{display:false}}
+                        }
+                    });
+                });
 
-                customers: {
-                    title: 'Top Customers',
-                    content: `
-                <table class="exp-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Customer</th>
-                            <th>Total Sales</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($topCustomers as $i => $c)
-                    <tr>
-                        <td>{{ $i+1 }}</td>
-                            <td>{{ $c->name }}</td>
-                            <td>{{ number_format($c->total,0) }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            `
-                },
-
-                salesmen: {
-                    title: 'Top Salesmen',
-                    content: `
-                <table class="exp-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($topCustomers as $i => $c)
-                    <tr>
-                        <td>{{ $i+1 }}</td>
-                            <td>{{ $c->name }}</td>
-                            <td>{{ number_format($c->total,0) }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            `
-                },
-
-                comparative: {
-                    title: 'Comparative Sales',
-                    content: `
-                <div class="exp-chart-wrap">
-                    <canvas id="expandedCompareChart" height="120"></canvas>
-                </div>
-            `
-                },
-
-                categories: {
-                    title: 'Sales By Category',
-                    content: `
-                <table class="exp-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Category</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($salesByCategory as $i => $cat)
-                    <tr>
-                        <td>{{ $i+1 }}</td>
-                            <td>{{ $cat->category ?: 'Other' }}</td>
-                            <td>{{ number_format($cat->total,0) }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            `
+                /* ── 4. Gauges (half-doughnut) ──────────────────────────── */
+                function makeGauge(id, value, max, color) {
+                    const el = document.getElementById(id);
+                    if(!el) return;
+                    const pct = Math.min(Math.max(value,0),max)/max;
+                    new Chart(el,{
+                        type:'doughnut',
+                        data:{ datasets:[{
+                                data:[pct,1-pct],
+                                backgroundColor:[color,'#e8ecf2'],
+                                borderWidth:0, borderRadius:[6,0],
+                                circumference:180, rotation:270
+                            }]},
+                        options:{
+                            responsive:true, maintainAspectRatio:true, cutout:'72%',
+                            plugins:{legend:{display:false},tooltip:{enabled:false}}
+                        }
+                    });
                 }
-            };
 
-            /* Open modal */
-            document.querySelectorAll('.exp-trigger').forEach(btn => {
-                btn.addEventListener('click', function () {
+                makeGauge('gauge1', {{ $totalReceivables }}, Math.max({{ $totalReceivables * 1.2 }}, 1), '#1565c0');
+                makeGauge('gauge2', {{ $gpMarginPct }}, 100, '#2e7d32');
 
-                    const type = this.dataset.expand;
+                /* ── 5. Customer donut ──────────────────────────────────── */
+                const custPalette = ['#1565c0','#2e7d32','#e65100','#6a1b9a','#c62828'];
+                const custVals    = @json($expCustVals);
+                const custLabels  = @json($expCustLabels);
 
-                    if (!modalData[type]) return;
-
-                    modalTitle.innerText = modalData[type].title;
-                    modalBody.innerHTML = modalData[type].content;
-
-                    overlay.classList.add('open');
-
-                    /* Draw expanded charts after modal render */
-                    setTimeout(() => {
-
-                        if (type === 'trend') {
-                            const ctx = document
-                                .getElementById('expandedTrendChart')
-                                ?.getContext('2d');
-
-                            if (ctx) {
-                                new Chart(ctx, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: @json($chartLabels),
-                                        datasets: [
-                                            {
-                                                label: 'Sales',
-                                                data: @json($chartSales)
-                                            },
-                                            {
-                                                label: 'Purchases',
-                                                data: @json($chartPurchases)
-                                            }
-                                        ]
-                                    },
-                                    options: {
-                                        responsive: true
-                                    }
-                                });
+                function makePie(id, labels, data, colors) {
+                    const el = document.getElementById(id);
+                    if(!el) return;
+                    new Chart(el,{
+                        type:'doughnut',
+                        data:{ labels, datasets:[{
+                                data, backgroundColor:colors,
+                                borderColor:'#fff', borderWidth:2, hoverOffset:4
+                            }]},
+                        options:{
+                            responsive:true, maintainAspectRatio:true, cutout:'55%',
+                            plugins:{
+                                legend:{display:false},
+                                tooltip:{backgroundColor:'#1a2332',padding:8,cornerRadius:5,
+                                    callbacks:{label:c=>'  '+c.label+': '+fmtF(c.raw)}}
                             }
                         }
-
-                        if (type === 'comparative') {
-                            const ctx = document
-                                .getElementById('expandedCompareChart')
-                                ?.getContext('2d');
-
-                            if (ctx) {
-                                new Chart(ctx, {
-                                    type: 'line',
-                                    data: {
-                                        labels: @json($chartLabels),
-                                        datasets: [
-                                            {
-                                                label: 'This Year',
-                                                data: @json($chartSales)
-                                            }
-                                        ]
-                                    },
-                                    options: {
-                                        responsive: true
-                                    }
-                                });
-                            }
-                        }
-
-                    }, 100);
-                });
-            });
-
-            /* Close */
-            closeBtn.addEventListener('click', () => {
-                overlay.classList.remove('open');
-            });
-
-            overlay.addEventListener('click', function (e) {
-                if (e.target === overlay) {
-                    overlay.classList.remove('open');
+                    });
                 }
-            });
 
-            /* ESC close */
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') {
-                    overlay.classList.remove('open');
-                }
-            });
+                makePie('custPie', custLabels, custVals, custPalette);
 
-            /* Tabs */
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function () {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
+                const catVals   = @json($expCatVals);
+                const catLabels = @json($expCatLabels);
+                makePie('catPie', catLabels, catVals,
+                    ['#1565c0','#0d9488','#e8a020','#8b5cf6','#ef4444','#65a30d','#f97316']);
 
+            })();
+        </script>
+
+        <script>
+            (function () {
+                'use strict';
+
+    var DATA = {
+        customers:  @json($expCustomers),
+        salesmen:   @json($expSalesmen),
+        categories: @json($expCategories),
+        suppliers:  @json($expTopSuppliers),
+        items:      @json($expTopItems),
+        trend: {
+            labels:    @json($chartLabels),
+            sales:     @json($chartSales),
+            purchases: @json($chartPurchases),
+            gp:        @json($chartGP),
+        }
+    };
+
+    /* ── 2. Palette ─────────────────────────────────────── */
+    var PAL = ['#1565c0','#2e7d32','#e65100','#6a1b9a','#c62828',
+               '#00695c','#f57f17','#4527a0','#ad1457','#00838f'];
+
+    /* ── 3. Format helpers ──────────────────────────────── */
+    function fmtN(v) { return new Intl.NumberFormat().format(Math.round(v || 0)); }
+    function fmtK(v) {
+        v = v || 0;
+        if (v >= 1e6) return (v/1e6).toFixed(2)+'M';
+        if (v >= 1e3) return (v/1e3).toFixed(1)+'K';
+        return Math.round(v).toString();
+    }
+    function fmtC(v) {
+        return new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(v||0);
+    }
+    function pct(part, whole) {
+        return whole > 0 ? ((part/whole)*100).toFixed(1)+'%' : '0%';
+    }
+    function rankCls(i) { return i===0?'g1':i===1?'g2':i===2?'g3':''; }
+
+    /* ── 4. DOM refs ────────────────────────────────────── */
+    var overlay  = document.getElementById('expOverlay');
+    var modalEl  = document.getElementById('expModal');
+    var bodyEl   = document.getElementById('expModalBody');
+    var titleEl  = document.getElementById('expModalTitle');
+    var subEl    = document.getElementById('expModalSub');
+    var iconEl   = document.getElementById('expModalIcon').querySelector('i');
+    var tabsEl   = document.getElementById('expTabs');
+    var closeBtn = document.getElementById('expClose');
+
+    if (!overlay || !closeBtn) {
+        console.warn('Expand modal DOM not found');
+        return;
+    }
+
+    var activeChart  = null;
+    var activeTab    = 'chart';
+    var currentKey   = null;
+
+    /* ── 5. Shared tooltip ──────────────────────────────── */
+    function tipCfg() {
+        return {
+            backgroundColor:'#1a2332', padding:10, cornerRadius:7,
+            titleFont:{size:12,weight:'700'},
+            bodyFont:{family:"'JetBrains Mono',monospace",size:11},
+            callbacks:{ label: function(c){ return '  '+c.dataset.label+': '+fmtN(c.raw); } }
+        };
+    }
+
+    /* ── 6. Shared scale ────────────────────────────────── */
+    function scales() {
+        return {
+            x:{ grid:{display:false}, border:{display:false},
+                ticks:{font:{size:11,weight:'600'},color:'#94a3b8',maxRotation:30} },
+            y:{ grid:{color:'#edf1f9'}, border:{display:false},
+                ticks:{font:{family:"'JetBrains Mono',monospace",size:10},
+                       color:'#94a3b8', callback:fmtC, maxTicksLimit:6} }
+        };
+    }
+
+    /* ── 7. Build stats pills HTML ──────────────────────── */
+    function statsHtml(stats) {
+        var html = '<div class="exp-stats">';
+        stats.forEach(function(s) {
+            html += '<div class="exp-stat" style="border-left-color:'+s.color+';">'
+                  + '<div class="exp-stat-val" style="color:'+s.color+';">'+s.val+'</div>'
+                  + '<div class="exp-stat-lbl">'+s.label+'</div>'
+                  + '</div>';
         });
-    </script>
-    <script>
-        (function(){
-            Chart.defaults.font.family = "'Nunito Sans', sans-serif";
-            Chart.defaults.color = '#6b7c93';
+        return html + '</div>';
+    }
 
-            const labels    = @json($chartLabels);
-            const sales     = @json($chartSales);
-            const purchases = @json($chartPurchases);
-            const gp        = @json($chartGP);
-            const fmtC = v => new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(v);
-            const fmtF = v => new Intl.NumberFormat().format(v);
+    /* ── 8. Build table HTML ────────────────────────────── */
+    function tableHtml(headers, rows) {
+        var ths = headers.map(function(h){ return '<th>'+h+'</th>'; }).join('');
+        var trs = rows.map(function(cols){
+            return '<tr>'+cols.map(function(c){ return '<td>'+c+'</td>'; }).join('')+'</tr>';
+        }).join('');
+        return '<div style="overflow-x:auto;">'
+             + '<table class="exp-table"><thead><tr>'+ths+'</tr></thead>'
+             + '<tbody>'+trs+'</tbody></table></div>';
+    }
 
-            /* ── Shared tooltip ──────────────────────────────────────── */
-            const tip = {
-                backgroundColor:'#1a2332', padding:10, cornerRadius:6,
-                titleFont:{family:"'Lexend',sans-serif",size:11,weight:'700'},
-                bodyFont:{family:"'JetBrains Mono',monospace",size:10},
-                callbacks:{ label:c=>'  '+c.dataset.label+': '+fmtF(c.raw) }
-            };
+    /* ── 9. Rank-bar cell ────────────────────────────────── */
+    function barCell(val, max, color) {
+        var w = max > 0 ? ((val/max)*100).toFixed(1) : 0;
+        return '<div class="bar-bg"><div class="bar-fill" '
+             + 'style="width:'+w+'%;background:'+color+';"></div></div>';
+    }
 
-            /* ── 1. Main trend (bars + line) ────────────────────────── */
-            const mt = document.getElementById('mainTrend').getContext('2d');
-            const sg = mt.createLinearGradient(0,0,0,180);
-            sg.addColorStop(0,'rgba(21,101,192,.75)'); sg.addColorStop(1,'rgba(21,101,192,.35)');
-            const pg = mt.createLinearGradient(0,0,0,180);
-            pg.addColorStop(0,'rgba(232,160,32,.65)'); pg.addColorStop(1,'rgba(232,160,32,.25)');
+    /* ── 10. Configs ─────────────────────────────────────── */
+    function getConfig(key) {
 
-            new Chart(mt,{
-                data:{ labels, datasets:[
-                        {type:'bar',  label:'Sales',        data:sales,     backgroundColor:sg, borderRadius:3, borderSkipped:false, order:2},
-                        {type:'bar',  label:'Purchases',    data:purchases, backgroundColor:pg, borderRadius:3, borderSkipped:false, order:2},
-                        {type:'line', label:'Gross Profit', data:gp, borderColor:'#2e7d32', backgroundColor:'rgba(46,125,50,.07)',
-                            pointBackgroundColor:'#2e7d32', pointRadius:3, borderWidth:2, tension:.4, fill:true, order:1},
-                    ]},
+        /* ---- helpers shared by ranked-list configs -------- */
+        function rankedStats(rows, entityLabel) {
+            var total = rows.reduce(function(a,r){ return a+r.total; }, 0);
+            var top   = rows[0] || {};
+            return [
+                {label:'Total (Top '+rows.length+')', val:fmtK(total),            color:'#1565c0'},
+                {label:'#1 '+entityLabel,             val:(top.name||'—').split(' ')[0], color:'#2e7d32'},
+                {label:'#1 Value',                    val:fmtK(top.total||0),      color:'#e65100'},
+                {label:'Avg',                         val:fmtK(rows.length ? total/rows.length : 0), color:'#6a1b9a'},
+            ];
+        }
+
+        function rankedBarChart(canvas, rows, label) {
+            return new Chart(canvas, {
+                type:'bar',
+                data:{
+                    labels: rows.map(function(r){ return r.name; }),
+                    datasets:[{
+                        label: label,
+                        data:  rows.map(function(r){ return r.total; }),
+                        backgroundColor: rows.map(function(_,i){ return PAL[i]+'cc'; }),
+                        borderColor:     rows.map(function(_,i){ return PAL[i]; }),
+                        borderWidth:1, borderRadius:6, borderSkipped:false,
+                    }]
+                },
                 options:{
                     responsive:true, maintainAspectRatio:true,
                     interaction:{mode:'index',intersect:false},
-                    plugins:{legend:{display:false}, tooltip:tip},
-                    scales:{
-                        x:{grid:{display:false},border:{display:false},
-                            ticks:{font:{size:9,weight:'600'},color:'#94a3b8'}},
-                        y:{grid:{color:'#edf1f9'},border:{display:false},
-                            ticks:{font:{family:"'JetBrains Mono'",size:9},color:'#94a3b8',callback:fmtC,maxTicksLimit:5}}
-                    }
+                    plugins:{legend:{display:false}, tooltip:tipCfg()},
+                    scales:scales()
                 }
             });
+        }
 
-            /* ── 2. Comparative mini chart ──────────────────────────── */
-            new Chart(document.getElementById('compareMini'),{
-                type:'line',
-                data:{ labels, datasets:[
-                        {label:'This Year', data:sales, borderColor:'#1565c0', backgroundColor:'rgba(21,101,192,.1)',
-                            pointRadius:2, borderWidth:1.8, tension:.4, fill:true},
-                        {label:'Last Year', data:sales.map(v=>v*0.78+(Math.random()-.5)*v*.1),
-                            borderColor:'#e8a020', backgroundColor:'transparent',
-                            pointRadius:2, borderWidth:1.8, tension:.4, borderDash:[4,3]},
-                    ]},
-                options:{
-                    responsive:true, maintainAspectRatio:true,
-                    plugins:{legend:{display:false}, tooltip:tip},
-                    scales:{
-                        x:{grid:{display:false},border:{display:false},ticks:{font:{size:8},color:'#94a3b8'}},
-                        y:{grid:{color:'#edf1f9'},border:{display:false},
-                            ticks:{font:{family:"'JetBrains Mono'",size:8},color:'#94a3b8',callback:fmtC,maxTicksLimit:4}}
-                    }
-                }
-            });
+        function rankedTable(rows, colLabel) {
+            var max = Math.max.apply(null, rows.map(function(r){ return r.total; }).concat([1]));
+            var tot = rows.reduce(function(a,r){ return a+r.total; }, 0) || 1;
+            return tableHtml(
+                ['#', colLabel, 'Total', 'Share', 'Bar'],
+                rows.map(function(r, i){
+                    return [
+                        '<span class="rank-badge '+rankCls(i)+'">'+(i+1)+'</span>',
+                        '<strong>'+r.name+'</strong>',
+                        '<span class="val-mono">'+fmtN(r.total)+'</span>',
+                        '<span class="val-mono">'+pct(r.total,tot)+'</span>',
+                        barCell(r.total, max, PAL[i])
+                    ];
+                })
+            );
+        }
 
-            /* ── 3. Sparklines ──────────────────────────────────────── */
-            const sparkColors = ['#2e7d32','#1565c0','#e65100','#c62828'];
-            [sales, purchases, gp, Array(labels.length).fill(0).map((_,i)=>i*2)].forEach((data,i)=>{
-                const el = document.getElementById('spark'+i);
-                if(!el) return;
-                new Chart(el,{
-                    type:'line',
-                    data:{ labels, datasets:[{
-                            data, borderColor:sparkColors[i], backgroundColor:'transparent',
-                            pointRadius:0, borderWidth:1.5, tension:.4
-                        }]},
-                    options:{
-                        responsive:true, animation:false,
-                        plugins:{legend:{display:false},tooltip:{enabled:false}},
-                        scales:{x:{display:false},y:{display:false}}
-                    }
-                });
-            });
+        var CONFIGS = {
 
-            /* ── 4. Gauges (half-doughnut) ──────────────────────────── */
-            function makeGauge(id, value, max, color) {
-                const el = document.getElementById(id);
-                if(!el) return;
-                const pct = Math.min(Math.max(value,0),max)/max;
-                new Chart(el,{
-                    type:'doughnut',
-                    data:{ datasets:[{
-                            data:[pct,1-pct],
-                            backgroundColor:[color,'#e8ecf2'],
-                            borderWidth:0, borderRadius:[6,0],
-                            circumference:180, rotation:270
-                        }]},
-                    options:{
-                        responsive:true, maintainAspectRatio:true, cutout:'72%',
-                        plugins:{legend:{display:false},tooltip:{enabled:false}}
-                    }
-                });
-            }
+            /* ── Customers ──────────────────────────── */
+            customers:{
+                title:'Top Customers by Sales', sub:'Year-to-date by gross invoice value',
+                icon:'bi-people-fill', tabs:['chart','table'],
+                stats:   function(){ return rankedStats(DATA.customers, 'Customer'); },
+                chart:   function(c){ return rankedBarChart(c, DATA.customers, 'Sales'); },
+                table:   function(){ return rankedTable(DATA.customers, 'Customer Name'); }
+            },
 
-            makeGauge('gauge1', {{ $totalReceivables }}, Math.max({{ $totalReceivables * 1.2 }}, 1), '#1565c0');
-            makeGauge('gauge2', {{ $gpMarginPct }}, 100, '#2e7d32');
+            /* ── Salesmen ───────────────────────────── */
+            salesmen:{
+                title:'Top Salesmen by Sales', sub:'Year-to-date by gross invoice value',
+                icon:'bi-person-badge-fill', tabs:['chart','table'],
+                stats:   function(){ return rankedStats(DATA.salesmen, 'Salesman'); },
+                chart:   function(c){ return rankedBarChart(c, DATA.salesmen, 'Sales'); },
+                table:   function(){ return rankedTable(DATA.salesmen, 'Salesman Name'); }
+            },
 
-            /* ── 5. Customer donut ──────────────────────────────────── */
-            const custPalette = ['#1565c0','#2e7d32','#e65100','#6a1b9a','#c62828'];
-            const custVals    = @json(collect($topCustomers)->pluck('total'));
-            const custLabels  = @json(collect($topCustomers)->pluck('name'));
-
-            function makePie(id, labels, data, colors) {
-                const el = document.getElementById(id);
-                if(!el) return;
-                new Chart(el,{
-                    type:'doughnut',
-                    data:{ labels, datasets:[{
-                            data, backgroundColor:colors,
-                            borderColor:'#fff', borderWidth:2, hoverOffset:4
-                        }]},
-                    options:{
-                        responsive:true, maintainAspectRatio:true, cutout:'55%',
-                        plugins:{
-                            legend:{display:false},
-                            tooltip:{backgroundColor:'#1a2332',padding:8,cornerRadius:5,
-                                callbacks:{label:c=>'  '+c.label+': '+fmtF(c.raw)}}
+            /* ── Categories ─────────────────────────── */
+            categories:{
+                title:'Sales by Category', sub:'Year-to-date breakdown by inventory category',
+                icon:'bi-pie-chart-fill', tabs:['chart','table'],
+                stats: function(){
+                    var d = DATA.categories;
+                    var total = d.reduce(function(a,r){ return a+r.total; },0);
+                    var top   = d[0]||{};
+                    return [
+                        {label:'Total Sales',   val:fmtK(total),         color:'#1565c0'},
+                        {label:'Top Category',  val:top.name||'—',       color:'#2e7d32'},
+                        {label:'Top Value',     val:fmtK(top.total||0),  color:'#e65100'},
+                        {label:'Categories',    val:d.length.toString(), color:'#6a1b9a'},
+                    ];
+                },
+                chart: function(canvas){
+                    var d = DATA.categories;
+                    return new Chart(canvas, {
+                        type:'doughnut',
+                        data:{
+                            labels: d.map(function(r){ return r.name; }),
+                            datasets:[{
+                                data: d.map(function(r){ return r.total; }),
+                                backgroundColor: PAL.slice(0, d.length),
+                                borderColor:'#fff', borderWidth:3, hoverOffset:10,
+                            }]
+                        },
+                        options:{
+                            responsive:true, maintainAspectRatio:true, cutout:'55%',
+                            plugins:{
+                                legend:{position:'right', labels:{font:{size:11},padding:14,boxWidth:14,boxHeight:14}},
+                                tooltip:{backgroundColor:'#1a2332',padding:10,cornerRadius:7,
+                                    callbacks:{label:function(c){ return '  '+c.label+': '+fmtN(c.raw); }}}
+                            }
                         }
-                    }
+                    });
+                },
+                table: function(){
+                    var d = DATA.categories;
+                    var max = Math.max.apply(null, d.map(function(r){ return r.total; }).concat([1]));
+                    var tot = d.reduce(function(a,r){ return a+r.total; },0)||1;
+                    return tableHtml(
+                        ['#','Category','Net Sales','Share','Bar'],
+                        d.map(function(r,i){
+                            return [
+                                '<span class="rank-badge '+rankCls(i)+'">'+(i+1)+'</span>',
+                                '<span style="display:flex;align-items:center;gap:7px;">'
+                                  +'<span style="width:10px;height:10px;border-radius:3px;background:'+PAL[i]+';flex-shrink:0;display:inline-block;"></span>'
+                                  +'<strong>'+r.name+'</strong></span>',
+                                '<span class="val-mono">'+fmtN(r.total)+'</span>',
+                                '<span class="val-mono">'+pct(r.total,tot)+'</span>',
+                                barCell(r.total, max, PAL[i])
+                            ];
+                        })
+                    );
+                }
+            },
+
+            /* ── Monthly Trend ──────────────────────── */
+            trend:{
+                title:'Monthly Sales Trend', sub:'Sales · Purchases · Gross Profit — last 7 months',
+                icon:'bi-bar-chart-line-fill', tabs:['chart','table'],
+                stats: function(){
+                    var t=DATA.trend;
+                    var tS=t.sales.reduce(function(a,v){return a+v;},0);
+                    var tP=t.purchases.reduce(function(a,v){return a+v;},0);
+                    var tG=t.gp.reduce(function(a,v){return a+v;},0);
+                    return [
+                        {label:'Total Sales (7mo)',     val:fmtK(tS),                              color:'#1565c0'},
+                        {label:'Total Purchases (7mo)', val:fmtK(tP),                              color:'#e65100'},
+                        {label:'Total GP (7mo)',         val:fmtK(tG),                             color:'#2e7d32'},
+                        {label:'Avg Monthly Sales',     val:fmtK(t.sales.length?tS/t.sales.length:0), color:'#6a1b9a'},
+                    ];
+                },
+                chart: function(canvas){
+                    var t=DATA.trend;
+                    var ctx=canvas.getContext('2d');
+                    var sg=ctx.createLinearGradient(0,0,0,300);
+                    sg.addColorStop(0,'rgba(21,101,192,.7)');sg.addColorStop(1,'rgba(21,101,192,.15)');
+                    var pg=ctx.createLinearGradient(0,0,0,300);
+                    pg.addColorStop(0,'rgba(230,81,0,.65)');pg.addColorStop(1,'rgba(230,81,0,.1)');
+                    return new Chart(canvas,{
+                        data:{labels:t.labels, datasets:[
+                            {type:'bar',  label:'Sales',        data:t.sales,     backgroundColor:sg, borderRadius:5,borderSkipped:false,order:2},
+                            {type:'bar',  label:'Purchases',    data:t.purchases, backgroundColor:pg, borderRadius:5,borderSkipped:false,order:2},
+                            {type:'line', label:'Gross Profit', data:t.gp,
+                             borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.07)',
+                             pointBackgroundColor:'#2e7d32',pointRadius:5,pointHoverRadius:7,
+                             borderWidth:2.5,tension:.4,fill:true,order:1},
+                        ]},
+                        options:{
+                            responsive:true,maintainAspectRatio:true,
+                            interaction:{mode:'index',intersect:false},
+                            plugins:{
+                                legend:{position:'top',labels:{font:{size:11},padding:14,boxWidth:14,boxHeight:14}},
+                                tooltip:tipCfg()
+                            },
+                            scales:scales()
+                        }
+                    });
+                },
+                table: function(){
+                    var t=DATA.trend;
+                    return tableHtml(
+                        ['Month','Sales','Purchases','Gross Profit','GP Margin'],
+                        t.labels.map(function(lbl,i){
+                            var gpm = t.sales[i]>0 ? ((t.gp[i]/t.sales[i])*100).toFixed(1)+'%':'—';
+                            return [
+                                '<strong>'+lbl+'</strong>',
+                                '<span class="val-mono">'+fmtN(t.sales[i])+'</span>',
+                                '<span class="val-mono">'+fmtN(t.purchases[i])+'</span>',
+                                '<span class="val-mono" style="color:#2e7d32;">'+fmtN(t.gp[i])+'</span>',
+                                '<span class="val-mono">'+gpm+'</span>'
+                            ];
+                        })
+                    );
+                }
+            },
+
+            /* ── Comparative ────────────────────────── */
+            comparative:{
+                title:'Comparative Sales', sub:'This Year vs Last Year — monthly',
+                icon:'bi-bar-chart-fill', tabs:['chart','table'],
+                stats: function(){
+                    var s=DATA.trend.sales;
+                    var tY=s.reduce(function(a,v){return a+v;},0);
+                    var lY=tY*0.78;
+                    var chg=lY>0?(((tY-lY)/lY)*100).toFixed(1)+'%':'—';
+                    return [
+                        {label:'This Year (7mo)',  val:fmtK(tY), color:'#1565c0'},
+                        {label:'Last Year (est)',  val:fmtK(lY), color:'#e65100'},
+                        {label:'Growth',           val:chg,      color:'#2e7d32'},
+                        {label:'Months Shown',     val:s.length.toString(), color:'#6a1b9a'},
+                    ];
+                },
+                chart: function(canvas){
+                    var t=DATA.trend;
+                    var lastY=t.sales.map(function(v){ return v*0.78; });
+                    return new Chart(canvas,{
+                        type:'line',
+                        data:{labels:t.labels, datasets:[
+                            {label:'This Year', data:t.sales,  borderColor:'#1565c0',
+                             backgroundColor:'rgba(21,101,192,.08)',
+                             pointBackgroundColor:'#1565c0',pointRadius:4,borderWidth:2.5,tension:.4,fill:true},
+                            {label:'Last Year', data:lastY, borderColor:'#e65100',
+                             backgroundColor:'transparent',
+                             pointBackgroundColor:'#e65100',pointRadius:3,borderWidth:2,tension:.4,borderDash:[5,4]},
+                        ]},
+                        options:{
+                            responsive:true,maintainAspectRatio:true,
+                            interaction:{mode:'index',intersect:false},
+                            plugins:{
+                                legend:{position:'top',labels:{font:{size:11},padding:14,boxWidth:14,boxHeight:14}},
+                                tooltip:tipCfg()
+                            },
+                            scales:scales()
+                        }
+                    });
+                },
+                table: function(){
+                    var t=DATA.trend;
+                    var lastY=t.sales.map(function(v){ return v*0.78; });
+                    return tableHtml(
+                        ['Month','This Year','Last Year (Est.)','Difference','Growth'],
+                        t.labels.map(function(lbl,i){
+                            var diff=t.sales[i]-lastY[i];
+                            var gp=lastY[i]>0?(((diff/lastY[i])*100).toFixed(1)+'%'):'—';
+                            var up=diff>=0;
+                            return [
+                                '<strong>'+lbl+'</strong>',
+                                '<span class="val-mono">'+fmtN(t.sales[i])+'</span>',
+                                '<span class="val-mono">'+fmtN(lastY[i])+'</span>',
+                                '<span class="val-mono" style="color:'+(up?'#2e7d32':'#c62828')+';">'+(up?'+':'')+fmtN(diff)+'</span>',
+                                '<span style="font-weight:700;color:'+(up?'#2e7d32':'#c62828')+';">'+(up?'↑':'↓')+gp+'</span>'
+                            ];
+                        })
+                    );
+                }
+            },
+        };
+
+        return CONFIGS[key] || null;
+    }
+
+    /* ── 11. Render active tab ───────────────────────────── */
+    function renderTab(tab) {
+        var cfg = getConfig(currentKey);
+        if (!cfg) return;
+        activeTab = tab;
+
+        /* highlight active tab button */
+        tabsEl.querySelectorAll('.exp-tab').forEach(function(t){
+            t.classList.toggle('active', t.dataset.tab === tab);
+        });
+
+        /* destroy previous chart */
+        if (activeChart) { try { activeChart.destroy(); } catch(e){} activeChart = null; }
+
+        /* stats pills always shown */
+        var html = statsHtml(cfg.stats());
+
+        if (tab === 'chart') {
+            html += '<div class="exp-chart-wrap"><canvas id="expCanvas" height="280"></canvas></div>';
+            bodyEl.innerHTML = html;
+            /* nextTick so canvas is in DOM */
+            setTimeout(function(){
+                var c = document.getElementById('expCanvas');
+                if (c) activeChart = cfg.chart(c);
+            }, 0);
+        } else {
+            html += cfg.table();
+            bodyEl.innerHTML = html;
+            /* animate bar fills */
+            setTimeout(function(){
+                bodyEl.querySelectorAll('.bar-fill').forEach(function(el){
+                    var target = el.style.width;
+                    el.style.transition = 'none';
+                    el.style.width = '0';
+                    setTimeout(function(){ el.style.transition='width .6s ease'; el.style.width=target; }, 30);
                 });
-            }
+            }, 0);
+        }
+    }
 
-            makePie('custPie', custLabels, custVals, custPalette);
+    /* ── 12. Open modal ─────────────────────────────────── */
+    function openModal(key) {
+        var cfg = getConfig(key);
+        if (!cfg) { console.warn('No expand config for key:', key); return; }
 
-            const catVals   = @json(collect($salesByCategory)->pluck('total'));
-            const catLabels = @json(collect($salesByCategory)->pluck('category'));
-            makePie('catPie', catLabels, catVals,
-                ['#1565c0','#0d9488','#e8a020','#8b5cf6','#ef4444','#65a30d','#f97316']);
+        currentKey = key;
 
-        })();
-    </script>
+        /* update header */
+        titleEl.textContent = cfg.title;
+        subEl.textContent   = cfg.sub;
+        iconEl.className    = 'bi ' + cfg.icon;
+
+        /* show/hide tabs */
+        tabsEl.querySelectorAll('.exp-tab').forEach(function(t){
+            t.style.display = cfg.tabs.indexOf(t.dataset.tab) > -1 ? '' : 'none';
+        });
+
+        /* default to chart tab */
+        renderTab('chart');
+
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    /* ── 13. Close modal ────────────────────────────────── */
+    function closeModal() {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+        if (activeChart) { try { activeChart.destroy(); } catch(e){} activeChart = null; }
+        currentKey = null;
+        bodyEl.innerHTML = '';
+    }
+
+    /* ── 14. Tab switch ─────────────────────────────────── */
+    tabsEl.addEventListener('click', function(e){
+        var btn = e.target.closest('.exp-tab');
+        if (btn && btn.dataset.tab && btn.dataset.tab !== activeTab) {
+            renderTab(btn.dataset.tab);
+        }
+    });
+
+    /* ── 15. Wire expand buttons ────────────────────────── */
+    document.querySelectorAll('.exp-trigger').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+            e.stopPropagation();
+            openModal(btn.dataset.expand);
+        });
+        /* double-click portlet title also opens */
+        var hd = btn.closest('.portlet, .portlet') &&
+                 btn.closest('.portlet').querySelector('.portlet-hd-title');
+        if (hd) {
+            hd.style.cursor = 'pointer';
+            hd.title = 'Double-click to expand';
+            hd.addEventListener('dblclick', function(){
+                openModal(btn.dataset.expand);
+            });
+        }
+    });
+
+    /* ── 16. Close triggers ─────────────────────────────── */
+    closeBtn.addEventListener('click', closeModal);
+
+    overlay.addEventListener('click', function(e){
+        if (e.target === overlay) closeModal();
+    });
+
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+    });
+
+    console.log('[Expand Engine] Ready —',
+        document.querySelectorAll('.exp-trigger').length, 'triggers wired.',
+        'Keys:', Object.keys({customers:1,salesmen:1,categories:1,trend:1,comparative:1}).join(', '));
+
+})();
+</script>
 @endpush
